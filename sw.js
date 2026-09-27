@@ -1,5 +1,5 @@
 // Петелька: офлайн-кэш. При изменении файлов увеличивайте VERSION.
-const VERSION = 'petelka-v1';
+const VERSION = 'petelka-v2';
 const CORE = [
   './',
   './index.html',

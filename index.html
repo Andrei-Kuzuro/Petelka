@@ -29,6 +29,10 @@
   color-scheme:dark;--bg:#121817;--panel:#1B2322;--ink:#E6EEEC;--muted:#98A6A3;--line:#2E3A38;--soft:#243030;
   --chain:#A9A69E;--r1:#A79CF0;--r2:#43C49C;--r3:#F08A5D;--r4:#7FB2EC;--felt:#E0A94E;--hook:#FFFFFF;--ghost:.16;--danger:#F2B8B5;}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+html{touch-action:manipulation}
+button,select,input[type=range],.stage svg,#upChart{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button{-webkit-user-select:none;user-select:none}
 body{background:var(--bg);color:var(--ink);font:16px/1.55 Manrope,system-ui,sans-serif;padding-inline:16px;padding-block:16px 96px;margin:0}
 .wrap{max-width:1040px;margin:0 auto;display:grid;gap:18px}
 header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
@@ -75,7 +79,10 @@ ol.pat li{font-size:15px;line-height:1.5;border-left:3px solid var(--line);paddi
 .legend svg{width:22px;height:22px;vertical-align:middle;margin-right:4px}
 .fut{opacity:var(--ghost)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-@media (prefers-reduced-motion:no-preference){#hookdot{animation:pulse 1.1s ease-in-out infinite}}
+@media (prefers-reduced-motion:no-preference){#hookdot,#upHookDot{animation:pulse 1.1s ease-in-out infinite}}
+.upwrap{overflow-x:auto}
+#upChart{display:block;width:100%;min-width:560px;height:auto}
+.side svg{width:100%;height:auto;display:block}
 .big{font:600 clamp(56px,14vw,96px)/1 Unbounded,system-ui,sans-serif;font-variant-numeric:tabular-nums;text-align:center}
 .bigsub{text-align:center;color:var(--muted);font-size:15px}
 .plus{font:600 22px Unbounded,system-ui,sans-serif;padding:22px;border-radius:16px;background:var(--ink);color:var(--panel);border:none;cursor:pointer;width:100%}
@@ -106,6 +113,7 @@ td.sym svg{width:30px;height:30px}
   </div>
   <nav role="tablist">
     <button role="tab" id="tab-gen" data-tab="gen" aria-selected="true">Подошва</button>
+    <button role="tab" id="tab-up" data-tab="up" aria-selected="false">Верх</button>
     <button role="tab" id="tab-cnt" data-tab="cnt" aria-selected="false">Счётчик</button>
     <button role="tab" id="tab-gauge" data-tab="gauge" aria-selected="false">Плотность</button>
     <button role="tab" id="tab-ref" data-tab="ref" aria-selected="false">Шпаргалка</button>
@@ -158,6 +166,55 @@ td.sym svg{width:30px;height:30px}
         <h2>Описание</h2>
         <ol class="pat" id="patList"></ol>
         <button class="btn main" id="toCounter">Вести счёт по этой схеме</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-up" role="tabpanel" class="wrap" style="gap:18px" hidden>
+    <div class="card">
+      <h2>Верх тапочка</h2>
+      <div class="methods" id="upModels" role="group" aria-label="Модель верха"></div>
+      <p class="muted" id="upNote" style="margin:0"></p>
+      <div class="fields">
+        <label class="f">Петель в последнем круге подошвы<input type="number" id="upN" min="20" max="240" step="1" value="82"></label>
+        <label class="f">Петель в 10 см (сбн)<input type="number" id="upSt" min="4" max="30" step="0.5" value="15"></label>
+        <label class="f">Рядов в 10 см (сбн)<input type="number" id="upRow" min="4" max="35" step="0.5" value="12"></label>
+      </div>
+      <div class="row"><button class="btn" id="upSync">Взять из вкладки «Подошва»</button><span class="muted" id="upSrc"></span></div>
+      <span class="err" id="upErr" hidden></span>
+      <div class="stats" id="upStats"></div>
+    </div>
+    <div class="grid2">
+      <div class="card side"><h2>Вид сбоку</h2><svg id="upSide" viewBox="0 0 320 180" role="img" aria-label="Силуэт выбранной модели"></svg></div>
+      <div class="card side"><h2>Разметка подошвы</h2><svg id="upTop" viewBox="0 0 320 150" role="img" aria-label="Деление подошвы на зоны"></svg><p class="muted" id="upTopCap" style="margin:0"></p></div>
+    </div>
+    <div class="card stage">
+      <div class="row" id="upJump"></div>
+      <div class="upwrap"><svg id="upChart" viewBox="0 0 680 400" role="img" aria-label="Схема верха с текущим шагом"></svg></div>
+      <input type="range" id="upScrub" min="0" max="1" value="0" aria-label="Положение в схеме верха">
+      <div class="row">
+        <button class="btn" id="upPrev" aria-label="Предыдущий шаг">◀</button>
+        <button class="btn main" id="upPlay" style="min-width:130px">▶ Вязать</button>
+        <button class="btn" id="upNext" aria-label="Следующий шаг">▶</button>
+        <select id="upSpeed" aria-label="Скорость" style="width:auto">
+          <option value="3200">Медленно</option><option value="1800" selected>Обычно</option><option value="800">Быстро</option>
+        </select>
+        <span class="count" id="upCount"></span>
+      </div>
+      <div class="legend" id="upLegend"></div>
+    </div>
+    <div class="grid2">
+      <div class="card" aria-live="polite">
+        <div class="eyebrow"><span id="upStage"></span><span id="upSeg"></span></div>
+        <h2 id="upAct" style="font:600 19px/1.3 Unbounded,system-ui,sans-serif;margin:0"></h2>
+        <p id="upWhere" style="margin:0"></p>
+        <div class="how"><b>Как вязать</b><span id="upHow"></span></div>
+        <div class="how"><b>На этом участке</b><span id="upTip"></span></div>
+      </div>
+      <div class="card">
+        <h2>Описание</h2>
+        <ol class="pat" id="upPat"></ol>
+        <button class="btn main" id="upToCounter">Вести счёт по этой схеме</button>
       </div>
     </div>
   </section>
@@ -262,7 +319,7 @@ const cm=x=>(Math.round(x*10)/10).toString().replace('.',',');
 
 /* ---------- tabs ---------- */
 const tabs=[...document.querySelectorAll('nav button')];
-function showTab(t){tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));['gen','cnt','gauge','ref'].forEach(x=>$('p-'+x).hidden=x!==t);store.set('petelka.tab',t);if(t!=='gen')stop();}
+function showTab(t){tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));['gen','up','cnt','gauge','ref'].forEach(x=>$('p-'+x).hidden=x!==t);store.set('petelka.tab',t);if(t!=='gen')stop();if(t!=='up'&&window.upStop)upStop();if(t==='up'&&window.upOnShow)upOnShow();}
 tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
 /* ---------- glyphs ---------- */
@@ -278,7 +335,7 @@ function iconSvg(t){const sv=document.createElementNS(NS,'svg');sv.setAttribute(
  if(t==='ch')mk('ellipse',{cx:11,cy:11,rx:7,ry:4,'stroke-width':1.3},g);
  else if(t==='sl')mk('circle',{cx:11,cy:11,r:3.2,fill:'var(--ink)',stroke:'none'},g);
  else if(t==='inc'){glyph(g,'sc',{x:11,y:20},{x:5,y:3},.8);glyph(g,'sc',{x:11,y:20},{x:17,y:3},.8);}
- else if(t==='dec'){glyph(g,'sc',{x:5,y:20},{x:11,y:3},.8);glyph(g,'sc',{x:17,y:20},{x:11,y:3},.8);}
+ else if(t==='dec'){ln(g,4,20,11,4,1.4);ln(g,18,20,11,4,1.4);ln(g,8,4,14,4,1.4);}
  else if(t==='ring')mk('circle',{cx:11,cy:11,r:6,'stroke-width':1.3},g);
  else if(t==='hole')mk('circle',{cx:11,cy:11,r:3.5,'stroke-width':1.3,stroke:'var(--felt)'},g);
  else if(t==='marker')mk('path',{d:'M5 6L17 6L11 15Z',fill:'var(--r1)',stroke:'none'},g);
@@ -397,6 +454,7 @@ function regen(){mb.forEach(([id,b])=>b.setAttribute('aria-pressed',id===method)
  svg.innerHTML='';steps=[];
  const ctx={layer:mk('g',{},svg),base:null};ctx.base=mk('g',{},ctx.layer);
  GEN=BUILDERS[method](inp,ctx);
+ {const t=GEN.counter.targets;GEN.lastCount=t[t.length-1]||null;}
  $('genStats').innerHTML=GEN.stats.map(([a,b])=>`<span class="chip">${a} <b>${b}</b></span>`).join('');
  $('patList').innerHTML=GEN.lines.map(x=>typeof x==='string'?`<li>${x}</li>`:`<li style="border-color:${COLN(x.k)}">${x.html}</li>`).join('');
  mk('text',{x:GEN.labels[0][0],y:GEN.labels[0][1],'text-anchor':'end','font-size':13,fill:'var(--muted)','font-family':'Manrope,sans-serif'},svg).textContent='пятка';
@@ -601,6 +659,240 @@ $('euSize').oninput=()=>{if(syncing)return;const e=+$('euSize').value;if(e>=20&&
 $('footLen').oninput=()=>{if(syncing)return;const f=+$('footLen').value;if(f>0){syncing=true;$('euSize').value=Math.round((f+1.5)*1.5);syncing=false;}regen();};
 ['allow','gSt','gRow','holeStep','holeInset','cordW'].forEach(id=>$(id).oninput=regen);
 
+/* ---------- upper (верх тапочка) ---------- */
+const UP_MODELS=[
+ ['ballet','1. Балетки','Низкие закрытые: бортик, купол мыска и край рачьим шагом. Мягкий задник.'],
+ ['classic','2. Классические с язычком','Бортик повыше, купол мыска и язычок поворотными рядами. Самая «тапочная» модель.'],
+ ['mule','3. Мюли','Закрытый нос, открытая пятка: после бортика вяжется только перед, поворотными рядами.'],
+ ['slides','4. Шлёпанцы с перемычкой','Низкий бортик по кругу и отдельная широкая перемычка поперёк стопы.'],
+ ['boots','5. Сапожки','Как классические, плюс голенище резинкой из рельефных столбиков.']];
+let upModel=store.get('petelka.upModel','classic');if(!UP_MODELS.some(m=>m[0]===upModel))upModel='classic';
+let upManual=store.get('petelka.upManual',false);
+const upMb=UP_MODELS.map(([id,label])=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>{upModel=id;store.set('petelka.upModel',id);upRegen();};$('upModels').appendChild(b);return [id,b];});
+const UPC={wall:'var(--r1)',dome:'var(--r2)',vamp:'var(--r3)',edge:'var(--felt)',cuff:'var(--r4)',sole:'var(--chain)'};
+const UPHOW={
+ blo:'Как сбн, но крючок вводится только под заднюю (дальнюю от вас) полупетлю. Передняя полупетля остаётся снаружи рантиком.',
+ sc:HOW.sc,dec:HOW.dec,sl:HOW.sl,
+ crab:'Рачий шаг: сбн, но слева направо. Крючок в петлю справа, вытянуть петлю, провязать обе. Край получается плотным жгутиком.',
+ cuff:'Рельефный лицевой ссн: накид, крючок вокруг ножки столбика спереди назад и снова вперёд, провязать как ссн. Изнаночный — так же, но крючок вводится сзади.',
+ round:'Весь круг по 1 сбн в каждую петлю, в конце соед. ст. в первую петлю.'};
+const UPTIP={
+ blo:'Этот круг задаёт «угол» между подошвой и стенкой. Не затягивайте: стенка должна стоять, а не заваливаться внутрь.',
+ wall:'Стенка поднимается вертикально. Каждый круг сбн даёт около {h} см.',
+ back:'Задняя половина в круге купола вяжется без убавок.',
+ dome:'Убавки собирают перед в купол над пальцами. Если волнится — на одну убавку меньше в первом круге купола.',
+ domeRow:'Купол мюли вяжется поворотными рядами только по переду; в конце каждого ряда соед. ст. в петлю бока.',
+ vamp:'Каждый ряд язычка «съедает» одну петлю бока, стороны чередуются. Так вход плотно облегает подъём стопы.',
+ edge:'Обвязка выравнивает край входа. Примерьте: нога должна проходить свободно.',
+ crab:'Рачий шаг не тянется и держит край, это важно для жёсткой полиэфирной пряжи.',
+ strap:'Перемычку примерьте на ногу и пришейте к внутренней стороне бортика поперёк самой широкой части стопы.',
+ cuff:'Резинка держит голенище. Первые круги вяжите внимательно, дальше рельеф ведёт сам.'};
+
+function upDomeTokens(m,d){const s=m-2*d,base=Math.floor(s/(d+1)),rem=s-base*d,lead=Math.floor(rem/2),rest=rem-lead;
+ const tk=[];for(let i=0;i<lead;i++)tk.push('s');for(let j=0;j<d;j++){tk.push('d');for(let i=0;i<base;i++)tk.push('s');}for(let i=0;i<rest;i++)tk.push('s');
+ const parts=[];if(lead)parts.push(lead+' сбн');parts.push(base?`(уб., ${base} сбн) ×${d}`:`уб. ×${d}`);if(rest)parts.push(rest+' сбн');
+ return {tk,text:parts.join(', '),after:m-d};}
+
+function upCalc(N,st10,row10,model){
+ const back=Math.floor(N/2),front=N-back,V=Math.max(3,Math.round(front*0.37)),D=Math.max(2,Math.round(row10/3));
+ const rh=10/row10,Wlow=Math.max(2,Math.round(2.5/rh)),Whigh=Math.max(Wlow+1,Math.round(3.3/rh)),VR=Math.max(2,2*Math.round(0.4*row10));
+ const totDec=front-V,dome=[];let m=front;
+ for(let i=0;i<D;i++){const d=Math.floor(totDec/D)+(i<totDec%D?1:0);if(d>Math.floor(m/2))return 'Слишком мало петель на переде для купола: проверьте число петель подошвы.';const r=upDomeTokens(m,d);dome.push({m,d,...r});m=r.after;}
+ const mvr=Math.max(2,VR-D);
+ const B={N,back,front,V,D,Wlow,Whigh,VR,mvr,dome,rh,st10,row10};
+ B.open=back-VR+V;B.openMule=back-(D+mvr)+V;
+ B.openE=B.open+(B.open%2);B.CR=Math.max(4,Math.round(13*row10/20));
+ B.Ws=Math.max(5,Math.round(st10)),B.Rs=Math.max(8,Math.round(2.2*row10));B.Wc=Math.max(3,Math.round(0.53*st10)),B.Rc=Math.round(2.5*row10);
+ if(back-VR<4)return 'Подошва слишком маленькая для этой плотности: язычок съест весь задник.';
+ return B;}
+
+function upSeq(B,model){const q=[];const W=(model==='classic'||model==='boots')?B.Whigh:B.Wlow;
+ q.push({t:'blo',label:'Круг 1'});for(let k=2;k<=W;k++)q.push({t:'plain',label:'Круг '+k});
+ if(model==='slides'){q.push({t:'crab',label:'Круг '+(W+1),count:B.N});q.push({t:'strap'});return q;}
+ const rows=model==='mule';B.dome.forEach((d,i)=>q.push({t:'dome',label:(rows?'Ряд ':'Круг ')+(W+1+i),...d,rows,idx:i}));
+ if(model==='ballet'){q.push({t:'crab',label:'Круг '+(W+B.D+1),count:B.back+B.V});return q;}
+ const nv=model==='mule'?B.mvr:B.VR,base=model==='mule'?W+B.D:0;
+ for(let r=1;r<=nv;r++)q.push({t:'vamp',label:model==='mule'?'Ряд '+(base+r):'Язычок, ряд '+r,r});
+ const open=model==='mule'?B.openMule:B.open;
+ q.push({t:'edge',label:'Обвязка',count:model==='boots'?B.openE:open,inc:model==='boots'&&B.open%2});
+ if(model==='boots'){for(let r=1;r<=B.CR;r++)q.push({t:'cuff',label:'Голенище, круг '+r,count:B.openE});q.push({t:'edgeTop',label:'Верх голенища',count:B.openE});}
+ q.push({t:'crab',label:'Рачий шаг',count:model==='boots'?B.openE:open});
+ return q;}
+
+/* chart + player */
+let upSteps=[],upCur=0,upTimer=null,upJ=[],upJb=[],UPB=null,UPQ=null;
+function upRegen(){upMb.forEach(([id,b])=>b.setAttribute('aria-pressed',id===upModel));
+ $('upNote').textContent=UP_MODELS.find(m=>m[0]===upModel)[2];
+ const N=+$('upN').value,st=+$('upSt').value,row=+$('upRow').value;
+ let err='';if(!(N>=20&&N<=240&&Number.isInteger(N)))err='Число петель подошвы: целое, от 20 до 240.';else if(!(st>=4&&st<=30&&row>=4&&row<=35))err='Плотность: 4–30 петель и 4–35 рядов в 10 см.';
+ let B=err?null:upCalc(N,st,row,upModel);if(typeof B==='string'){err=B;B=null;}
+ $('upErr').hidden=!err;$('upErr').textContent=err;if(!B)return;
+ store.set('petelka.upIn',{N,st,row});UPB=B;UPQ=upSeq(B,upModel);
+ upStats();upPattern();upSide();upTop();upBuildChart();upCur=0;upStop();upRender();}
+
+function upStats(){const B=UPB,h=x=>cm(x*B.rh),m=upModel;const W=(m==='classic'||m==='boots')?B.Whigh:B.Wlow;
+ const st=[['Зад / перед',B.back+' / '+B.front+' п.']];
+ if(m!=='slides')st.push(['Купол',B.front+' → '+B.V+' п. за '+B.D+(m==='mule'?' ряда':' круга')]);
+ if(m==='classic'||m==='boots')st.push(['Язычок',B.V+' п. × '+B.VR+' рядов']);
+ if(m==='mule')st.push(['Язычок',B.V+' п. × '+B.mvr+' рядов']);
+ if(m==='classic'||m==='mule')st.push(['Вход',(m==='mule'?B.openMule:B.open)+' п. ≈ '+cm((m==='mule'?B.openMule:B.open)*10/B.st10)+' см']);
+ if(m==='boots')st.push(['Голенище',B.openE+' п. × '+B.CR+' кругов']);
+ if(m==='slides')st.push(['Перемычка',B.Ws+' п. × '+B.Rs+' рядов']);
+ const bh=m==='ballet'?W+B.D+1:m==='classic'?W+B.D+2:m==='mule'||m==='slides'?W+1:W+B.D+2;
+ st.push(['Высота задника','≈'+h(bh)+(m==='boots'?' + голенище ≈'+cm(B.CR*2*B.rh)+' см':' см')]);
+ $('upStats').innerHTML=st.map(([a,b])=>`<span class="chip">${a} <b>${b}</b></span>`).join('');}
+
+function upPattern(){const B=UPB,m=upModel,L=[];
+ L.push(`<b>Разметка:</b> маркерами разделите последний круг подошвы пополам: зад ${B.back} п., перед ${B.front} п. Нить присоедините на середине пятки.`);
+ UPQ.forEach(s=>{
+  if(s.t==='blo')L.push({k:1,html:`<b>${s.label}:</b> 1 в. п., ${B.N} сбн за заднюю полупетлю (BLO), соед. ст. <b>(итого ${B.N})</b>`});
+  else if(s.t==='plain')L.push({k:1,html:`<b>${s.label}:</b> ${B.N} сбн <b>(итого ${B.N})</b>`});
+  else if(s.t==='dome')L.push({k:2,html:s.rows?`<b>${s.label}:</b> только по переду: ${s.text}, соед. ст. в петлю бока, поворот <b>(перед ${s.after})</b>`:`<b>${s.label}:</b> зад ${B.back} сбн; перед: ${s.text} <b>(итого ${B.back+s.after})</b>`});
+  else if(s.t==='vamp'&&s.r===1){const n=upModel==='mule'?B.mvr:B.VR;L.push({k:3,html:`<b>${upModel==='mule'?'Ряды '+s.label.replace('Ряд ','')+'–'+(+s.label.replace('Ряд ','')+n-1):'Язычок, ряды 1–'+n}:</b> ${B.V} сбн по центральным петлям, соед. ст. в следующую петлю бока, поворот; в начале ряда соед. ст. пропускать <b>(${B.V})</b>`});}
+  else if(s.t==='edge')L.push({k:5,html:`<b>${s.label}:</b> сбн по краю входа: ${s.count-B.V-(s.inc?1:0)} сзади + ${B.V} по язычку${s.inc?', 1 прибавка сзади':''} <b>(итого ${s.count})</b>`});
+  else if(s.t==='cuff'&&s.label.endsWith(' 1'))L.push({k:4,html:`<b>Голенище, круги 1–${B.CR}:</b> 2 в. п., (FPdc, BPdc) ×${B.openE/2}, соед. ст. <b>(${B.openE})</b>`});
+  else if(s.t==='edgeTop')L.push({k:5,html:`<b>${s.label}:</b> ${s.count} сбн <b>(${s.count})</b>`});
+  else if(s.t==='crab')L.push({k:5,html:`<b>${s.label}:</b> рачий шаг по всему краю <b>(${s.count})</b>`});
+  else if(s.t==='strap'){L.push({k:3,html:`<b>Перемычка:</b> ${B.Ws+1} в. п., со 2-й петли ${B.Ws} сбн; всего ${B.Rs} рядов по ${B.Ws} сбн <b>(≈ ${cm(B.Ws*10/B.st10)} × ${cm(B.Rs*B.rh)} см)</b>`});
+   L.push('Примерьте и пришейте концы к внутренней стороне бортика поперёк самой широкой части стопы, примерно в 10 см от носка.');
+   L.push(`<b>Вариант:</b> две полоски ${B.Wc} п. × ${B.Rc} рядов крест-накрест.`);}});
+ if(upModel==='classic'||upModel==='boots'||upModel==='mule')L.push('Примерка после язычка: если вход тугой, свяжите язычок на 2 ряда короче.');
+ const col=k=>['','var(--r1)','var(--r2)','var(--r3)','var(--r4)','var(--felt)'][k];
+ $('upPat').innerHTML=L.map(x=>typeof x==='string'?`<li>${x}</li>`:`<li style="border-color:${col(x.k)}">${x.html}</li>`).join('');}
+
+function upSide(){const s=$('upSide');s.innerHTML='';const m=upModel;
+ const t=(x,y,str,an)=>{mk('text',{x,y,'font-size':11,'text-anchor':an||'start',fill:'var(--muted)','font-family':'Manrope,sans-serif'},s).textContent=str;};
+ const O={
+  ballet:'M20 148 L20 110 Q20 106 26 106 L60 108 Q120 116 165 128 Q205 132 238 114 Q270 98 290 112 Q304 124 302 148 Z',
+  classic:'M20 148 L20 102 Q20 98 26 98 L64 100 Q112 106 140 124 Q150 130 162 126 Q170 104 200 98 Q250 90 280 104 Q304 118 302 148 Z',
+  mule:'M20 148 L20 130 Q20 128 24 128 L128 128 Q150 128 162 124 Q170 104 200 98 Q250 90 280 104 Q304 118 302 148 Z',
+  slides:'M20 148 L20 132 Q20 130 24 130 L290 130 Q302 132 302 148 Z',
+  boots:'M20 148 L20 24 Q20 18 26 18 L136 18 Q142 18 142 24 L148 90 Q156 100 172 98 Q212 90 250 92 Q286 96 296 112 Q304 124 302 148 Z'}[m];
+ const OPEN={
+  ballet:'M20 107 L60 108 Q120 116 165 128 Q205 132 238 114',
+  classic:'M20 99 L64 100 Q112 106 140 124 Q150 130 162 126 Q166 114 172 104',
+  mule:'M20 129 L128 129 Q150 128 162 124 Q166 114 172 104',
+  slides:'M20 131 L290 131',
+  boots:'M20 19 L141 19'}[m];
+ const defs=mk('defs',{},s),cp=mk('clipPath',{id:'upSideClip'},defs);mk('path',{d:O},cp);
+ const g=mk('g',{'clip-path':'url(#upSideClip)'},s);
+ mk('path',{d:O,fill:'var(--r1)','fill-opacity':.22,stroke:'none'},g);
+ mk('rect',{x:0,y:134,width:320,height:14,fill:'var(--r1)','fill-opacity':.3},g);
+ const seam=m==='ballet'?228:238;
+ if(m!=='slides')mk('path',{d:`M${seam} 40 Q${seam-10} 100 ${seam-2} 134 L330 134 L330 40 Z`,fill:'var(--r2)','fill-opacity':.45},g);
+ if(m==='classic'||m==='mule'||m==='boots')mk('path',{d:`M${m==='boots'?146:164} 40 L${m==='boots'?146:164} 134 L${seam-2} 134 Q${seam-10} 100 ${seam} 40 Z`,fill:'var(--r3)','fill-opacity':.42},g);
+ if(m==='boots'){mk('rect',{x:0,y:0,width:146,height:104,fill:'var(--r4)','fill-opacity':.35},g);for(let x=28;x<142;x+=9)mk('line',{x1:x,y1:22,x2:x,y2:102,stroke:'var(--r4)','stroke-width':1.1,'stroke-opacity':.7},g);}
+ mk('path',{d:O,fill:'none',stroke:'var(--muted)','stroke-width':.8,'stroke-opacity':.6},s);
+ if(m==='slides'){mk('path',{d:'M180 131 C178 98 186 84 205 82 C224 84 232 98 230 131 Z',fill:'var(--r3)','fill-opacity':.5,stroke:'var(--felt)','stroke-width':1.6},s);t(236,100,'≈ 10 см от носка');}
+ mk('path',{d:OPEN,fill:'none',stroke:'var(--felt)','stroke-width':2.4,'stroke-linecap':'round'},s);
+ mk('rect',{x:16,y:148,width:290,height:9,rx:4.5,fill:'var(--chain)','fill-opacity':.65},s);
+ t(18,172,'пятка');t(304,172,'мысок','end');
+ const cap={ballet:'обвязка по всему краю',classic:'вход: задник + верх язычка',mule:'пятка открыта',slides:'бортик + перемычка',boots:'голенище резинкой'}[m];t(160,172,cap,'middle');}
+
+function upTop(){const s=$('upTop'),B=UPB;s.innerHTML='';const hc={x:95,y:72},tc={x:235,y:72},rh=34,rt=46;
+ const O=`M${hc.x} ${hc.y-rh}L${tc.x} ${tc.y-rt}A${rt} ${rt} 0 0 1 ${tc.x} ${tc.y+rt}L${hc.x} ${hc.y+rh}A${rh} ${rh} 0 0 1 ${hc.x} ${hc.y-rh}Z`;
+ const defs=mk('defs',{},s),cp=mk('clipPath',{id:'upTopClip'},defs);mk('path',{d:O},cp);const g=mk('g',{'clip-path':'url(#upTopClip)'},s);
+ mk('path',{d:O,fill:'var(--chain)','fill-opacity':.18},g);
+ const mx=165;mk('rect',{x:mx,y:0,width:200,height:150,fill:'var(--r2)','fill-opacity':.28},g);
+ if(upModel!=='slides'&&upModel!=='ballet'){const hw=Math.max(10,Math.min(34,46*B.V/B.front*1.25));mk('rect',{x:172,y:72-hw,width:92,height:2*hw,rx:hw*.6,fill:'var(--r3)','fill-opacity':.45},g);}
+ if(upModel==='slides')mk('rect',{x:196,y:0,width:26,height:150,fill:'var(--r3)','fill-opacity':.45},g);
+ mk('path',{d:O,fill:'none',stroke:'var(--chain)','stroke-width':1},s);
+ mk('line',{x1:mx,y1:28,x2:mx,y2:116,stroke:'var(--r2)','stroke-width':1,'stroke-dasharray':'3 3'},s);
+ [[mx,31],[mx,113]].forEach(([x,y])=>mk('circle',{cx:x,cy:y,r:4,fill:'var(--r2)'},s));
+ const t=(x,y,str,an,c)=>{mk('text',{x,y,'font-size':12,'text-anchor':an||'middle',fill:c||'var(--ink)','font-family':'Manrope,sans-serif'},s).textContent=str;};
+ t(95,76,'зад '+B.back);t(mx,20,'маркер');t(mx,132,'маркер');
+ if(upModel==='slides'||upModel==='ballet'){t(215,76,'перед '+B.front);}
+ else{t(218,76,'язычок '+B.V);t(282,40,'перед '+B.front,'end');}
+ $('upTopCap').textContent=`Круг ${B.N} п. делится маркерами пополам. `+(upModel==='slides'?'Перемычка пришивается поперёк передней половины.':upModel==='ballet'?'Передняя половина собирается в купол мыска.':`Центральные ${B.V} п. после купола вяжутся язычком по верху стопы.`);}
+
+function upBuildChart(){const svg=$('upChart'),B=UPB;svg.innerHTML='';upSteps=[];
+ const nF=B.front,x0=112,x1=664,dx=Math.min(14,(x1-x0)/(nF-1)),z=Math.max(.5,Math.min(1,dx/14)),xc=(x0+x1)/2;
+ const gapOf=s=>s.t==='cuff'?40:s.t==='strap'?0:24;
+ const strapH=upModel==='slides'?B.Rs*Math.min(18,Math.max(12,360/B.Rs))+30:0;
+ let H=40+24;UPQ.forEach(s=>H+=gapOf(s));H+=strapH+30;svg.setAttribute('viewBox',`0 0 680 ${H}`);
+ const lay=mk('g',{},svg);const label=(y,str)=>{mk('text',{x:8,y:y+4,'font-size':11,fill:'var(--muted)','font-family':'Manrope,sans-serif'},lay).textContent=str;};
+ const bar=(g,y,col)=>mk('rect',{x:74,y:y-7,width:30,height:14,rx:3,fill:col,'fill-opacity':.28,stroke:col,'stroke-width':1},g);
+ const even=n=>{const r=[];for(let i=0;i<n;i++)r.push(xc+(i-(n-1)/2)*dx);return r;};
+ let y=H-28;let xs=even(nF);
+ xs.forEach(x=>mk('circle',{cx:x,cy:y,r:2,fill:'var(--chain)'},lay));bar(lay,y,'var(--chain)');label(y,'подошва');
+ mk('text',{x:89,y:y+22,'font-size':10,'text-anchor':'middle',fill:'var(--muted)','font-family':'Manrope,sans-serif'},lay).textContent='зад';
+ mk('text',{x:xc,y:y+22,'font-size':10,'text-anchor':'middle',fill:'var(--muted)','font-family':'Manrope,sans-serif'},lay).textContent='перед '+nF+' п. (середина мыска по центру)';
+ const add=o=>{o.g=mk('g',{fill:'none'},lay);upSteps.push(o);return o;};
+ const scRow=(g,list,yy,col,blo)=>{g.setAttribute('stroke',col);list.forEach(x=>{glyph(g,'sc',{x,y:yy+8},{x,y:yy-8},z);if(blo)mk('path',{d:`M${x-4*z} ${yy+10} q${4*z} -4 ${8*z} 0`,'stroke-width':1.1},g);});};
+ const W=(upModel==='classic'||upModel==='boots')?B.Whigh:B.Wlow;const stepH=cm(B.rh);
+ let sideL=null,sideR=null;
+ UPQ.forEach(s=>{
+  if(s.t==='blo'||s.t==='plain'){y-=24;const o=add({c:'wall',type:s.t==='blo'?'blo':'round',stage:s.label,seg:s.t==='blo'?'Бортик':'Стенка',P:{x:xs[0]-6,y},jump:s.t==='blo'?'Бортик':null,
+   act:s.t==='blo'?`${B.N} сбн за заднюю полупетлю`:`${B.N} сбн по кругу`,where:s.t==='blo'?'От середины пятки по всему последнему кругу подошвы.':'В каждую петлю предыдущего круга, начиная с середины пятки.',tip:s.t==='blo'?UPTIP.blo:UPTIP.wall.replace('{h}',stepH),cnt:`итого ${B.N}`});
+   bar(o.g,y,UPC.wall);scRow(o.g,xs,y,UPC.wall,s.t==='blo');label(y,s.label);}
+  else if(s.t==='dome'){y-=24;label(y,s.label);const yb=y+24;
+   if(!s.rows){const o=add({c:'wall',type:'round',stage:s.label,seg:'Зад',P:{x:89,y},jump:s.idx===0?'Купол':null,act:`Зад: ${B.back} сбн`,where:'От середины пятки до маркера, без убавок.',tip:UPTIP.back,cnt:`зад ${B.back}`});bar(o.g,y,UPC.wall);}
+   const nx=even(s.after);let k=0,n=0;s.tk.forEach((t,i)=>{const cx=nx[n];n++;
+    if(t==='s'){const px=xs[k];const o=add({c:'dome',type:'sc',stage:s.label,seg:'Купол мыска',P:{x:cx,y},jump:s.rows&&s.idx===0&&n===1?'Купол':null,act:NAME.sc,where:'В следующую петлю переда.',tip:s.rows?UPTIP.domeRow:UPTIP.dome,cnt:`перед ${n} / ${s.after}`});o.g.setAttribute('stroke',UPC.dome);
+     glyph(o.g,'sc',{x:cx,y:y+8},{x:cx,y:y-8},z);k++;}
+    else{const xa=xs[k],xb=xs[k+1];const o=add({c:'dome',type:'dec',stage:s.label,seg:'Купол мыска',P:{x:cx,y},act:'Убавка (dec): 2 петли вместе',where:'Вытяните петли из двух следующих петель переда и провяжите вместе.',tip:s.rows?UPTIP.domeRow:UPTIP.dome,cnt:`перед ${n} / ${s.after}`});
+     o.g.setAttribute('stroke',UPC.dome);const lw=dx*.55;ln(o.g,cx-lw,y+9,cx,y-7);ln(o.g,cx+lw,y+9,cx,y-7);ln(o.g,cx-3,y-7,cx+3,y-7);k+=2;}});
+   xs=nx;
+   if(s.rows){const right=s.idx%2===0;const sx=right?xs[xs.length-1]+dx*2:xs[0]-dx*2;const o=add({c:'wall',type:'sl',stage:s.label,seg:'Край ряда',P:{x:sx,y},act:'Соед. ст. в следующую петлю бока, поворот',where:'Этот соед. ст. в следующем ряду пропускается.',tip:UPTIP.domeRow,cnt:`перед ${s.after}`});
+    o.g.setAttribute('stroke',UPC.wall);slDot(o.g,sx,y);}}
+  else if(s.t==='vamp'){y-=24;label(y,s.label.replace('Язычок, ',''));if(sideL===null){sideL=xs[0]-dx*2.2;sideR=xs[xs.length-1]+dx*2.2;}
+   const right=s.r%2===1;const order=right?xs:xs.slice().reverse();
+   order.forEach((x,i)=>{const o=add({c:'vamp',type:'sc',stage:s.label,seg:'Язычок',P:{x,y},jump:s.r===1&&i===0?'Язычок':null,act:NAME.sc,where:i===0?(s.r===1?'Первый ряд язычка: в первую из центральных петель после купола.':'Пропустите соед. ст. и вяжите в первую петлю язычка.'):'В следующую петлю язычка.',tip:UPTIP.vamp,cnt:`петля ${i+1} / ${B.V}`});
+    o.g.setAttribute('stroke',UPC.vamp);glyph(o.g,'sc',{x,y:y+8},{x,y:y-8},z);});
+   const sx=right?sideR:sideL;const o=add({c:'wall',type:'sl',stage:s.label,seg:'Край ряда',P:{x:sx,y},act:'Соед. ст. в следующую петлю бока, поворот',where:`Петля бока «съедается». ${right?'Следующий ряд пойдёт в обратную сторону.':''}`,tip:UPTIP.vamp,cnt:`${B.V} п.`});
+   o.g.setAttribute('stroke',UPC.wall);mk('circle',{cx:sx,cy:y+10,r:3,'stroke-width':1.2},o.g);slDot(o.g,sx,y);}
+  else if(s.t==='edge'||s.t==='edgeTop'){y-=24;xs=even(Math.min(s.count,nF));if(s.count>nF)label(y+12,'');label(y,s.t==='edge'?'обвязка':'верх');const o=add({c:'edge',type:'round',stage:s.label,seg:'Край входа',P:{x:xs[0],y},jump:s.t==='edge'?'Обвязка':null,act:`${s.count} сбн по краю входа`,where:s.t==='edge'?`Сзади по оставшимся петлям бортика и по верху язычка${s.inc?', плюс 1 прибавка сзади, чтобы число стало чётным':''}.`:'По верху голенища.',tip:UPTIP.edge,cnt:`итого ${s.count}`});
+   bar(o.g,y,UPC.edge);scRow(o.g,xs,y,UPC.edge);}
+  else if(s.t==='cuff'){y-=40;xs=even(Math.min(s.count,nF));label(y+10,s.label.replace('Голенище, ',''));const o=add({c:'cuff',type:'cuff',stage:s.label,seg:'Голенище',P:{x:xs[0],y},jump:s.label.endsWith(' 1')?'Голенище':null,act:`(FPdc, BPdc) ×${s.count/2}`,where:'2 в. п. подъёма (не считаются), затем по кругу чередуйте рельефные столбики, соед. ст.',tip:UPTIP.cuff,cnt:`итого ${s.count}`});
+   o.g.setAttribute('stroke',UPC.cuff);bar(o.g,y+10,UPC.cuff);xs.forEach((x,i)=>{ln(o.g,x,y+26,x,y-6);ln(o.g,x-4,y-6,x+4,y-6);ln(o.g,x-3,y+12,x+3,y+8);mk('path',{d:i%2===0?`M${x} ${y+26} q-6 0 -6 -5`:`M${x} ${y+26} q6 0 6 -5`,'stroke-width':1.3},o.g);});}
+  else if(s.t==='crab'){y-=24;if(upModel!=='slides')xs=even(Math.min(s.count,nF));label(y,'рачий шаг');const o=add({c:'edge',type:'crab',stage:s.label,seg:'Финиш края',P:{x:xs[xs.length-1],y},jump:'Рачий шаг',act:`Рачий шаг: ${s.count} петель`,where:'Слева направо по всему краю, по 1 в каждую петлю.',tip:UPTIP.crab,cnt:`итого ${s.count}`});
+   o.g.setAttribute('stroke',UPC.edge);let d=`M${xs[0]-4} ${y}`;xs.forEach(x=>d+=` q${dx/4} -6 ${dx/2} 0 q${dx/4} 6 ${dx/2} 0`);mk('path',{d,'stroke-width':2},o.g);bar(o.g,y,UPC.edge);}
+  else if(s.t==='strap'){const rg=Math.min(18,Math.max(12,360/B.Rs)),sdx=Math.min(20,(x1-x0)/(B.Ws)),sx0=xc-(B.Ws-1)*sdx/2;y-=30;label(y,'перемычка');
+   const oc=add({c:'wall',type:'ch',stage:'Перемычка',seg:'Цепочка',P:{x:sx0-sdx,y},jump:'Перемычка',act:`${B.Ws+1} в. п.`,where:'Отдельная деталь. Последняя петля — петля подъёма.',tip:UPTIP.strap,cnt:`${B.Ws+1} в. п.`});
+   oc.g.setAttribute('stroke','var(--chain)');for(let i=0;i<=B.Ws;i++)mk('ellipse',{cx:sx0-sdx+i*sdx,cy:y,rx:Math.min(5,sdx*.35),ry:3,'stroke-width':1.2},oc.g);
+   for(let r=1;r<=B.Rs;r++){y-=rg;const o=add({c:'vamp',type:'sc',stage:'Перемычка',seg:'Ряд '+r,P:{x:r%2?sx0:sx0+(B.Ws-1)*sdx,y},act:`Ряд ${r}: ${B.Ws} сбн`,where:r===1?'Со 2-й петли от крючка.':'1 в. п. подъёма, поворот, по 1 сбн в каждую петлю.',tip:UPTIP.strap,cnt:`ряд ${r} / ${B.Rs}`});
+    o.g.setAttribute('stroke',UPC.vamp);for(let i=0;i<B.Ws;i++){const x=sx0+i*sdx;glyph(o.g,'sc',{x,y:y+rg*.4},{x,y:y-rg*.4},Math.min(z,rg/20));}if(r%5===0||(r===B.Rs&&r%5>2))label(y,'ряд '+r);}}});
+ const last=upSteps[upSteps.length-1];add({c:'edge',type:'end',stage:'Финиш',seg:'',P:last.P,act:upModel==='slides'?'Детали готовы':'Верх готов',where:upModel==='slides'?'Пришейте перемычку к бортику, примерив на ногу.':'Спрячьте хвостики иглой с широким ушком.',tip:TIP.end,cnt:'готово'});
+ const hook=mk('g',{id:'upHook'},svg);mk('circle',{id:'upHookDot',r:6,fill:'none',stroke:'var(--hook)','stroke-width':2},hook);
+ upJ=[];upSteps.forEach((s,i)=>{if(s.jump)upJ.push([s.jump,i]);});
+ $('upJump').innerHTML='';upJb=upJ.map(([l,i])=>{const b=document.createElement('button');b.className='btn';b.style.padding='6px 12px';b.style.fontSize='13px';b.textContent=l;b.onclick=()=>{upStop();upGo(i);};$('upJump').appendChild(b);return b;});
+ $('upScrub').max=upSteps.length-1;
+ const lg=$('upLegend');lg.innerHTML='';[['sc','сбн (sc)'],['dec','убавка (dec)'],['sl','соед. ст. (sl st)']].forEach(([t,l])=>{const w=document.createElement('span');w.appendChild(iconSvg(t));w.appendChild(document.createTextNode(l));lg.appendChild(w);});
+ [['var(--r1)','бортик и зад'],['var(--r2)','купол'],['var(--r3)','язычок, перемычка'],['var(--r4)','голенище'],['var(--felt)','обвязка']].forEach(([c,l])=>{const w=document.createElement('span');w.innerHTML=`<span class="swatch" style="background:${c}"></span>${l}`;lg.appendChild(w);});
+ const w=document.createElement('span');w.textContent='полоса слева — задняя половина круга';lg.appendChild(w);}
+function slDot(g,x,y){mk('circle',{cx:x,cy:y,r:3,fill:'currentColor',stroke:'none'},g).setAttribute('fill',g.getAttribute('stroke'));}
+
+function upRender(){if(!upSteps.length)return;
+ upSteps.forEach((s,i)=>{s.g.classList.toggle('fut',i>upCur);s.g.querySelectorAll('line').forEach(e=>e.setAttribute('stroke-width',i===upCur?2.6:1.5));});
+ const s=upSteps[upCur],hook=$('upHook');hook.setAttribute('transform',`translate(${s.P.x} ${s.P.y})`);hook.style.display=s.type==='end'?'none':'';
+ $('upStage').innerHTML=`<span class="swatch" style="background:${UPC[s.c]||UPC.wall}"></span>`+s.stage;$('upSeg').textContent=s.seg||'';
+ $('upAct').textContent=s.act;$('upWhere').textContent=s.where;$('upHow').textContent=UPHOW[s.type]||HOW[s.type]||'Закрепите нить.';$('upTip').textContent=s.tip||'';
+ $('upCount').textContent=s.cnt||'';$('upScrub').value=upCur;let a=0;upJ.forEach(([,i],k)=>{if(upCur>=i)a=k;});upJb.forEach((b,k)=>b.classList.toggle('main',k===a));
+ $('upPlay').textContent=upTimer?'❚❚ Пауза':(upCur>=upSteps.length-1?'↺ Сначала':'▶ Вязать');}
+function upGo(i){upCur=Math.max(0,Math.min(upSteps.length-1,i));if(upCur>=upSteps.length-1)upStop();upRender();}
+function upTick(){if(upCur>=upSteps.length-1){upStop();upRender();return;}upCur++;upTimer=setTimeout(upTick,+$('upSpeed').value);upRender();}
+function upStop(){clearTimeout(upTimer);upTimer=null;}
+window.upStop=()=>{upStop();if(upSteps.length)upRender();};
+function upToggle(){if(upTimer){upStop();upRender();}else{if(upCur>=upSteps.length-1)upCur=0;upTimer=setTimeout(upTick,+$('upSpeed').value);upRender();}}
+$('upPlay').onclick=upToggle;$('upNext').onclick=()=>{upStop();upGo(upCur+1);};$('upPrev').onclick=()=>{upStop();upGo(upCur-1);};
+$('upScrub').oninput=()=>{upStop();upGo(+$('upScrub').value);};$('upSpeed').onchange=()=>{if(upTimer){upStop();upToggle();}};
+
+function upSyncFromSole(){const n=GEN&&GEN.lastCount;
+ if(n){$('upN').value=n;$('upSrc').textContent=`из подошвы: ${n} п.`;}else $('upSrc').textContent='У этого способа подошвы нет счёта петель края: введите число вручную после обвязки.';
+ $('upSt').value=$('gSt').value;$('upRow').value=$('gRow').value;}
+$('upSync').onclick=()=>{upManual=false;store.set('petelka.upManual',false);upSyncFromSole();upRegen();};
+['upN','upSt','upRow'].forEach(id=>$(id).oninput=()=>{upManual=true;store.set('petelka.upManual',true);$('upSrc').textContent='введено вручную';upRegen();});
+window.upOnShow=()=>{if(!upManual)upSyncFromSole();upRegen();};
+$('upToCounter').onclick=()=>{if(!UPB)return;const B=UPB,labels=[],targets=[];
+ UPQ.forEach(s=>{if(s.t==='blo'||s.t==='plain'){labels.push(s.label);targets.push(B.N);}
+  else if(s.t==='dome'){labels.push(s.label+' (купол)');targets.push(s.rows?s.after:B.back+s.after);}
+  else if(s.t==='vamp'){labels.push(s.label);targets.push(B.V);}
+  else if(s.t==='edge'||s.t==='edgeTop'||s.t==='cuff'||s.t==='crab'){labels.push(s.label);targets.push(s.count);}
+  else if(s.t==='strap'){labels.push('Перемычка: цепочка');targets.push(B.Ws+1);for(let r=1;r<=B.Rs;r++){labels.push('Перемычка, ряд '+r);targets.push(B.Ws);}}});
+ const m=UP_MODELS.find(x=>x[0]===upModel)[1].replace(/^\d+\.\s*/,'');
+ projects.push({name:`Верх: ${m} (${B.N} п.)`,rows:[],row:0,stitch:0,labels,targets});curProj=projects.length-1;renderCnt();showTab('cnt');};
+{const sv=store.get('petelka.upIn',null);if(sv&&upManual){$('upN').value=sv.N;$('upSt').value=sv.st;$('upRow').value=sv.row;}}
+
 /* ---------- counter ---------- */
 let projects=store.get('petelka.projects',[]),curProj=store.get('petelka.cur',0);
 if(!projects.length)projects=[{name:'Подошва 42 (пример)',rows:[],row:0,stitch:0,labels:[],targets:[]}];
@@ -664,10 +956,9 @@ document.addEventListener('keydown',e=>{const t=e.target.tagName;if(t==='INPUT'|
  else if(!$('p-cnt').hidden&&(e.code==='Space'||e.key==='Enter')){e.preventDefault();pj().stitch++;renderCnt();}});
 const saved=store.get('petelka.gen',null);if(saved){$('footLen').value=saved.foot;$('allow').value=saved.allow;$('gSt').value=saved.st10;$('gRow').value=saved.row10;$('euSize').value=Math.round((saved.foot+1.5)*1.5);if(saved.holeStep)$('holeStep').value=saved.holeStep;if(saved.holeInset)$('holeInset').value=saved.holeInset;if(saved.cordW)$('cordW').value=saved.cordW;}
 regen();renderCnt();gauge();
-const h=(location.hash||'').slice(1);showTab(['gen','cnt','gauge','ref'].includes(h)?h:store.get('petelka.tab','gen'));
+const h=(location.hash||'').slice(1);showTab(['gen','up','cnt','gauge','ref'].includes(h)?h:store.get('petelka.tab','gen'));
 })();
 </script>
-
 <script>
 (function(){
 const $=id=>document.getElementById(id),bar=$('installBar');let deferred=null;
