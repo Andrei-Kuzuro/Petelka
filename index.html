@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Петелька</title>
+<meta name="description" content="Схемы подошвы по размеру, счётчик рядов, калькулятор плотности и шпаргалка для вязания крючком.">
+<meta name="theme-color" content="#F1F4F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121817" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Петелька">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px)}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#F1F4F3;--panel:#FFFFFF;--ink:#1C2826;--muted:#5B6966;--line:#D5DEDB;--soft:#E6ECEA;
+  --chain:#8A8780;--r1:#6A5BC7;--r2:#128466;--r3:#C44F22;--r4:#2D6FB5;--felt:#B07418;--hook:#1C2826;--ghost:.13;--danger:#B3261E;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#121817;--panel:#1B2322;--ink:#E6EEEC;--muted:#98A6A3;--line:#2E3A38;--soft:#243030;
+  --chain:#A9A69E;--r1:#A79CF0;--r2:#43C49C;--r3:#F08A5D;--r4:#7FB2EC;--felt:#E0A94E;--hook:#FFFFFF;--ghost:.16;--danger:#F2B8B5;}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#121817;--panel:#1B2322;--ink:#E6EEEC;--muted:#98A6A3;--line:#2E3A38;--soft:#243030;
+  --chain:#A9A69E;--r1:#A79CF0;--r2:#43C49C;--r3:#F08A5D;--r4:#7FB2EC;--felt:#E0A94E;--hook:#FFFFFF;--ghost:.16;--danger:#F2B8B5;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Manrope,system-ui,sans-serif;padding-inline:16px;padding-block:16px 96px;margin:0}
+.wrap{max-width:1040px;margin:0 auto;display:grid;gap:18px}
+header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+header h1{font:600 26px/1.1 Unbounded,system-ui,sans-serif;margin:0}
+header span{color:var(--muted);font-size:14px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{font:500 14px Manrope,sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:8px 14px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+@media (max-width:640px){
+  nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--panel);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));justify-content:space-around;gap:4px;flex-wrap:nowrap}
+  nav button{flex:1;padding:8px 4px;font-size:13px;border:none}
+}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:12px;align-content:start}
+.card h2{font:600 17px/1.3 Unbounded,system-ui,sans-serif;margin:0}
+.muted{color:var(--muted);font-size:14px}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input[type=number],input[type=text],select{font:500 16px Manrope,sans-serif;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+.btn{font:500 15px Manrope,sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:10px 14px;cursor:pointer}
+.btn.main{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn.warn{color:var(--danger);border-color:var(--danger)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--r1);outline-offset:2px}
+.methods{display:flex;gap:8px;flex-wrap:wrap}
+.methods button{font:500 14px Manrope,sans-serif;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 12px;cursor:pointer;text-align:left}
+.methods button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--soft);border-radius:8px;padding:6px 10px;font-size:14px}
+.chip b{font-family:'JetBrains Mono',monospace;font-weight:500;font-variant-numeric:tabular-nums}
+ol.pat{margin:0;padding-left:0;list-style:none;display:grid;gap:8px}
+ol.pat li{font-size:15px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px}
+.stage svg{width:100%;height:auto;display:block}
+#scrub{width:100%;accent-color:var(--ink)}
+.count{font:500 14px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--muted)}
+.eyebrow{font:500 12px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+#act{font:600 19px/1.3 Unbounded,system-ui,sans-serif;margin:0;text-wrap:balance}
+.how{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:14px}
+.how b{display:block;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted)}
+.legend svg{width:22px;height:22px;vertical-align:middle;margin-right:4px}
+.fut{opacity:var(--ghost)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:no-preference){#hookdot{animation:pulse 1.1s ease-in-out infinite}}
+.big{font:600 clamp(56px,14vw,96px)/1 Unbounded,system-ui,sans-serif;font-variant-numeric:tabular-nums;text-align:center}
+.bigsub{text-align:center;color:var(--muted);font-size:15px}
+.plus{font:600 22px Unbounded,system-ui,sans-serif;padding:22px;border-radius:16px;background:var(--ink);color:var(--panel);border:none;cursor:pointer;width:100%}
+.bar{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--r2);width:0}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+td.sym svg{width:30px;height:30px}
+.mono{font-family:'JetBrains Mono',monospace;font-size:13px}
+.result{font:600 20px/1.3 Unbounded,system-ui,sans-serif}
+.err{color:var(--danger);font-size:13px}
+
+.install{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--soft);border-radius:12px;padding:10px 12px;font-size:14px}
+.install .btn{padding:6px 12px;font-size:14px}
+.offline{font:500 12px 'JetBrains Mono',monospace;color:var(--muted);margin-left:auto}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header><h1>Петелька</h1><span>схемы, счёт и расчёты для вязания крючком</span><span class="offline" id="netState"></span></header>
+  <div class="install" id="installBar" hidden>
+    <span id="installText">Установите «Петельку» на главный экран: будет работать без интернета.</span>
+    <button class="btn main" id="installBtn">Установить</button>
+    <button class="btn" id="installClose" aria-label="Скрыть">Не сейчас</button>
+  </div>
+  <nav role="tablist">
+    <button role="tab" id="tab-gen" data-tab="gen" aria-selected="true">Подошва</button>
+    <button role="tab" id="tab-cnt" data-tab="cnt" aria-selected="false">Счётчик</button>
+    <button role="tab" id="tab-gauge" data-tab="gauge" aria-selected="false">Плотность</button>
+    <button role="tab" id="tab-ref" data-tab="ref" aria-selected="false">Шпаргалка</button>
+  </nav>
+
+  <section id="p-gen" role="tabpanel" class="wrap" style="gap:18px">
+    <div class="card">
+      <h2>Подошва по размеру</h2>
+      <div class="methods" id="methods" role="group" aria-label="Способ вязания подошвы"></div>
+      <p class="muted" id="methodNote" style="margin:0"></p>
+      <div class="fields">
+        <label class="f">Размер обуви (EU)<input type="number" id="euSize" min="20" max="50" step="1" value="42"></label>
+        <label class="f">Длина стопы, см<input type="number" id="footLen" min="12" max="33" step="0.5" value="26.5"></label>
+        <label class="f">Запас по длине, см<input type="number" id="allow" min="0" max="2" step="0.5" value="0.5"></label>
+        <label class="f" id="fSt">Петель в 10 см (сбн)<input type="number" id="gSt" min="4" max="30" step="0.5" value="9"></label>
+        <label class="f" id="fRow">Рядов в 10 см (сбн)<input type="number" id="gRow" min="4" max="35" step="0.5" value="8"></label>
+        <label class="f" id="fHole" hidden>Шаг отверстий, см<input type="number" id="holeStep" min="0.5" max="2" step="0.1" value="0.9"></label>
+        <label class="f" id="fInset" hidden>Отступ от края, см<input type="number" id="holeInset" min="0.3" max="1.2" step="0.1" value="0.6"></label>
+        <label class="f" id="fCord" hidden>Ширина шнура, см<input type="number" id="cordW" min="0.5" max="3" step="0.1" value="1.5"></label>
+      </div>
+      <span class="err" id="genErr" hidden></span>
+      <div class="stats" id="genStats"></div>
+    </div>
+
+    <div class="card stage">
+      <div class="row" id="jump"></div>
+      <svg id="chart" viewBox="0 0 680 300" role="img" aria-label="Схема подошвы с текущим шагом"></svg>
+      <input type="range" id="scrub" min="0" max="1" value="0" aria-label="Положение в схеме">
+      <div class="row">
+        <button class="btn" id="prev" aria-label="Предыдущий шаг">◀</button>
+        <button class="btn main" id="play" style="min-width:130px">▶ Вязать</button>
+        <button class="btn" id="next" aria-label="Следующий шаг">▶</button>
+        <select id="speed" aria-label="Скорость" style="width:auto">
+          <option value="3200">Медленно</option><option value="1800" selected>Обычно</option><option value="800">Быстро</option>
+        </select>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card" aria-live="polite">
+        <div class="eyebrow"><span id="stage"></span><span id="seg"></span></div>
+        <h2 id="act"></h2>
+        <p id="where" style="margin:0"></p>
+        <div class="how"><b>Как вязать</b><span id="how"></span></div>
+        <div class="how"><b>На этом участке</b><span id="tip"></span></div>
+      </div>
+      <div class="card">
+        <h2>Описание</h2>
+        <ol class="pat" id="patList"></ol>
+        <button class="btn main" id="toCounter">Вести счёт по этой схеме</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-cnt" role="tabpanel" hidden>
+    <div class="grid2">
+      <div class="card">
+        <div class="row">
+          <select id="projSel" aria-label="Проект" style="flex:1;min-width:160px"></select>
+          <button class="btn" id="projNewBtn">Новый</button>
+        </div>
+        <div class="row" id="projNewRow" hidden>
+          <input type="text" id="projName" placeholder="Название, например: шарф" style="flex:1;min-width:160px">
+          <button class="btn main" id="projCreate">Создать</button>
+        </div>
+        <div class="eyebrow"><span id="cRowLabel">Ряд</span><span id="cTarget"></span></div>
+        <div class="big" id="cStitch">0</div>
+        <div class="bigsub" id="cSub">петель в этом ряду</div>
+        <div class="bar"><i id="cBar"></i></div>
+        <button class="plus" id="cPlus">+ петля</button>
+        <div class="row">
+          <button class="btn" id="cMinus" style="flex:1">− петля</button>
+          <button class="btn main" id="cRowDone" style="flex:1">Ряд готов →</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2 id="cProjTitle">Проект</h2>
+        <div class="stats">
+          <span class="chip">Ряд <b id="cRowNum">1</b></span>
+          <span class="chip">Всего петель <b id="cTotal">0</b></span>
+        </div>
+        <div class="row">
+          <button class="btn" id="cRowBack">← Ряд назад</button>
+          <button class="btn" id="cResetRow">Обнулить ряд</button>
+        </div>
+        <div class="row">
+          <button class="btn warn" id="cDelete">Удалить проект</button>
+          <span id="cDelConfirm" hidden class="row"><span class="muted">Точно удалить?</span><button class="btn warn" id="cDelYes">Да, удалить</button><button class="btn" id="cDelNo">Отмена</button></span>
+        </div>
+        <p class="muted" style="margin:0">Пробел или Enter добавляет петлю. Счёт сохраняется в этом браузере на этом устройстве.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-gauge" role="tabpanel" hidden>
+    <div class="grid3">
+      <div class="card">
+        <h2>Ваш образец</h2>
+        <div class="fields">
+          <label class="f">Ширина, см<input type="number" id="sW" value="10" min="1" step="0.5"></label>
+          <label class="f">Петель в ширину<input type="number" id="sSt" value="9" min="1"></label>
+          <label class="f">Высота, см<input type="number" id="sH" value="10" min="1" step="0.5"></label>
+          <label class="f">Рядов в высоту<input type="number" id="sR" value="8" min="1"></label>
+          <label class="f">Вес образца, г<input type="number" id="sG" value="22" min="0" step="1"></label>
+        </div>
+        <div class="stats" id="gOut"></div>
+        <button class="btn main" id="gToGen">Передать в генератор подошвы</button>
+      </div>
+      <div class="card">
+        <h2>Пересчёт схемы</h2>
+        <p class="muted" style="margin:0">Схема написана под другую плотность. Сколько петель набрать вам?</p>
+        <div class="fields">
+          <label class="f">Плотность в схеме, п/10 см<input type="number" id="pSt" value="12" min="1" step="0.5"></label>
+          <label class="f">Петель в схеме<input type="number" id="pN" value="60" min="1"></label>
+        </div>
+        <div class="result" id="pOut"></div>
+        <hr style="border:none;border-top:1px solid var(--line);width:100%">
+        <label class="f">Нужная ширина полотна, см<input type="number" id="wantW" value="50" min="1"></label>
+        <label class="f">Нужная высота, см<input type="number" id="wantH" value="30" min="1"></label>
+        <div class="result" id="wOut"></div>
+      </div>
+      <div class="card">
+        <h2>Расход пряжи</h2>
+        <div class="fields">
+          <label class="f">Площадь изделия, см²<input type="number" id="area" value="1200" min="1"></label>
+          <label class="f">Метраж, м на 100 г<input type="number" id="mPer" value="100" min="1"></label>
+          <label class="f">Запас, %<input type="number" id="reserve" value="15" min="0" max="100"></label>
+        </div>
+        <div class="result" id="yOut"></div>
+        <p class="muted" style="margin:0">Площадь прямоугольника = ширина × высота. Для пары тапочек посчитайте одну и умножьте на 2.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-ref" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Обозначения и сокращения</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Символ</th><th>Название</th><th>RU</th><th>US</th><th>UK</th><th>Как вязать</th></tr></thead>
+        <tbody id="refBody"></tbody>
+      </table></div>
+      <p class="muted" style="margin:0">В британских схемах названия сдвинуты на одну ступень: UK dc — это наш столбик без накида (US sc). Проверяйте, по какой системе написана схема.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg',$=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const cm=x=>(Math.round(x*10)/10).toString().replace('.',',');
+
+/* ---------- tabs ---------- */
+const tabs=[...document.querySelectorAll('nav button')];
+function showTab(t){tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));['gen','cnt','gauge','ref'].forEach(x=>$('p-'+x).hidden=x!==t);store.set('petelka.tab',t);if(t!=='gen')stop();}
+tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+/* ---------- glyphs ---------- */
+function mk(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)if(a[k]!=null)e.setAttribute(k,a[k]);p.appendChild(e);return e;}
+function ln(p,x1,y1,x2,y2,w){return mk('line',{x1,y1,x2,y2,'stroke-width':w||1.5,'stroke-linecap':'round'},p);}
+function glyph(p,t,B,P,z){z=z||1;let dx=P.x-B.x,dy=P.y-B.y,l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;const nx=-dy,ny=dx,M={x:(B.x+P.x)/2,y:(B.y+P.y)/2};
+ if(t==='sc'){const k=3.8*z;ln(p,M.x-dx*k-nx*k,M.y-dy*k-ny*k,M.x+dx*k+nx*k,M.y+dy*k+ny*k);ln(p,M.x-dx*k+nx*k,M.y-dy*k+ny*k,M.x+dx*k-nx*k,M.y+dy*k-ny*k);return;}
+ const b={x:B.x+dx*3*z,y:B.y+dy*3*z},q={x:P.x-dx*2*z,y:P.y-dy*2*z};ln(p,b.x,b.y,q.x,q.y);
+ if(t==='tr'){ln(p,M.x-nx*3.5*z-dx*5*z,M.y-ny*3.5*z-dy*5*z,M.x+nx*3.5*z-dx*z,M.y+ny*3.5*z-dy*z);ln(p,M.x-nx*3.5*z+dx*z,M.y-ny*3.5*z+dy*z,M.x+nx*3.5*z+dx*5*z,M.y+ny*3.5*z+dy*5*z);}
+ ln(p,q.x-nx*4.5*z,q.y-ny*4.5*z,q.x+nx*4.5*z,q.y+ny*4.5*z);
+ if(t==='dc')ln(p,M.x-nx*3.5*z-dx*2.5*z,M.y-ny*3.5*z-dy*2.5*z,M.x+nx*3.5*z+dx*2.5*z,M.y+ny*3.5*z+dy*2.5*z);}
+function iconSvg(t){const sv=document.createElementNS(NS,'svg');sv.setAttribute('viewBox','0 0 22 22');const g=mk('g',{stroke:'var(--ink)',fill:'none'},sv);
+ if(t==='ch')mk('ellipse',{cx:11,cy:11,rx:7,ry:4,'stroke-width':1.3},g);
+ else if(t==='sl')mk('circle',{cx:11,cy:11,r:3.2,fill:'var(--ink)',stroke:'none'},g);
+ else if(t==='inc'){glyph(g,'sc',{x:11,y:20},{x:5,y:3},.8);glyph(g,'sc',{x:11,y:20},{x:17,y:3},.8);}
+ else if(t==='dec'){glyph(g,'sc',{x:5,y:20},{x:11,y:3},.8);glyph(g,'sc',{x:17,y:20},{x:11,y:3},.8);}
+ else if(t==='ring')mk('circle',{cx:11,cy:11,r:6,'stroke-width':1.3},g);
+ else if(t==='hole')mk('circle',{cx:11,cy:11,r:3.5,'stroke-width':1.3,stroke:'var(--felt)'},g);
+ else if(t==='marker')mk('path',{d:'M5 6L17 6L11 15Z',fill:'var(--r1)',stroke:'none'},g);
+ else if(t==='cord')mk('line',{x1:3,y1:11,x2:19,y2:11,'stroke-width':6,stroke:'var(--r3)','stroke-opacity':.6,'stroke-linecap':'round'},g);
+ else glyph(g,t,{x:11,y:t==='sc'?19:21},{x:11,y:t==='sc'?3:1});
+ return sv;}
+const pol=(C,r,d)=>({x:C.x+r*Math.cos(d*Math.PI/180),y:C.y+r*Math.sin(d*Math.PI/180)});
+
+/* ---------- common texts ---------- */
+const RU={sc:'сбн',hdc:'пссн',dc:'ссн'},EN={sc:'sc',hdc:'hdc',dc:'dc'};
+const NAME={sc:'Столбик без накида (sc)',hdc:'Полустолбик с накидом (hdc)',dc:'Столбик с накидом (dc)',ch:'Воздушная петля (ch)',sl:'Соединительный столбик (sl st)'};
+const HOW={sc:'Введите крючок в петлю, захватите нить и вытяните петлю (на крючке 2). Захватите нить и протяните через обе.',
+ hdc:'Накид, введите крючок, вытяните петлю (на крючке 3). Накид и протяните сразу через все 3.',
+ dc:'Накид, введите крючок, вытяните петлю (на крючке 3). Накид, протяните через 2. Ещё накид, протяните через последние 2.',
+ ch:'Захватите нить крючком и протяните через петлю на крючке. Не затягивайте.',
+ sl:'Введите крючок в петлю, захватите нить и протяните сразу через петлю полотна и петлю на крючке.',
+ dec:'Введите крючок в петлю, вытяните петлю; введите в следующую, вытяните петлю (на крючке 3). Захватите нить и протяните через все 3.',
+ prep:'Подготовительный шаг: крючок пока не нужен.',
+ cord:'Шнур «гусеничка»: 2 в. п., 1 сбн во 2-ю от крючка; дальше поворачивайте шнур и вяжите сбн под обе нити левой петли. Или заплетите косу из трёх нитей.',
+ sew:'Прочная нить в цвет и игла с широким ушком. Прихватывайте соседние витки мелкими стежками с изнанки через каждые 1,5–2 см.'};
+const COLN=k=>k===0?'var(--chain)':k===5?'var(--felt)':'var(--r'+(((k-1)%4)+1)+')';
+function sizeOf(g){return g.reduce((s,q)=>s+q[1],0);}
+function spread(P,m){m=Math.min(m,P);const a=[];for(let i=0;i<P;i++)a.push(Math.floor((i+1)*m/P)>Math.floor(i*m/P));return a;}
+function runs(tokens){const out=[];let i=0;while(i<tokens.length){let j=i;while(j<tokens.length&&tokens[j]===tokens[i])j++;const c=j-i,t=tokens[i],inc=t.endsWith('+'),b=t.replace('+','');
+  if(inc)out.push(c>1?`(2 ${RU[b]} в одну петлю) ×${c}`:`2 ${RU[b]} (${EN[b]}) в одну петлю`);else out.push(`${c} ${RU[b]} (${EN[b]})`);i=j;}return out.join(', ');}
+function describe(groups){const tk=groups.map(([t,c])=>t+(c>1?'+':''));const N=tk.length;
+ for(let u=2;u<=N/2;u++){if(N%u)continue;let ok=true;for(let i=u;i<N;i++)if(tk[i]!==tk[i%u]){ok=false;break;}if(ok)return `(${runs(tk.slice(0,u))}) ×${N/u}`;}
+ return runs(tk);}
+
+/* ---------- oval math ---------- */
+function buildOval(p){
+ const L=p.foot+p.allow,w=10/p.st10,h=10/p.row10;
+ const K=Math.max(2,Math.min(12,Math.round(0.28*L/(2*h))));
+ const tH=k=>k===1?h:(k===K?1.6*h:1.28*h);
+ let toeCum=[0],c=0;for(let k=1;k<=K;k++){c+=tH(k);toeCum.push(c);}
+ const heelExt=K*h,toeExt=c,n=Math.max(4,Math.round((L-heelExt-toeExt)/w)),S=n-2;
+ const side=k=>{const a=[];if(k===1){for(let i=0;i<S;i++)a.push('sc');return a;}
+  if(k<K){const nh=Math.round(S*.4);for(let i=0;i<S;i++)a.push(i>=S-nh?'hdc':'sc');return a;}
+  const d=Math.round(S*.2),hh=Math.round(S*.27);for(let i=0;i<S;i++)a.push(i>=S-d?'dc':i>=S-d-hh?'hdc':'sc');return a;};
+ const toeT=k=>k===1?'sc':(k===K?'dc':'hdc');
+ const R=[];let ph=3,pt=3;
+ for(let k=1;k<=K;k++){const r={k};
+  if(k===1){r.hf=[['sc',1]];r.he=[['sc',1],['sc',1]];r.toe=[['sc',1],['sc',1],['sc',1]];}
+  else{const hm=spread(ph,3).map(b=>['sc',b?2:1]);r.hf=hm.slice(0,k-1);r.he=hm.slice(k-1);const tt=toeT(k);r.toe=spread(pt,tt==='dc'?5:4).map(b=>[tt,b?2:1]);}
+  const sd=side(k);r.top=sd.map(t=>[t,1]);r.bot=sd.slice().reverse().map(t=>[t,1]);
+  r.heel=sizeOf(r.hf)+sizeOf(r.he);r.toeN=sizeOf(r.toe);r.total=r.heel+r.toeN+2*S;ph=r.heel;pt=r.toeN;R.push(r);}
+ return {L,w,h,K,n,S,R,toeCum,heelW:2*heelExt,toeW:2*toeExt,chainCm:n*w};}
+
+function ovalGeom(P){const H={x:180,y:150},T={x:500,y:150},s=320/(P.n-1),pxc=s/P.w,z=Math.max(.45,Math.min(1,pxc*P.h/22));
+ const A=k=>pxc*k*P.h,B=k=>pxc*P.toeCum[k];
+ const chain=[];for(let i=1;i<=P.n+1;i++)chain.push({x:T.x-s*(i-1),y:H.y});
+ const rounds=P.R.map(r=>{const k=r.k,a=A(k),b=B(k),pa=A(k-1),pb=B(k-1),off=(A_,B_,x)=>A_+(B_-A_)*(x-H.x)/(T.x-H.x),pos={};
+  const heel=r.he.concat(r.hf),nh=sizeOf(heel),nE=sizeOf(r.he);let j=0;const hs=[];
+  heel.forEach(([t,c])=>{const an=[];for(let q=0;q<c;q++){an.push(90+(j+.5)*180/nh);j++;}const m=an.reduce((x,y)=>x+y)/c,Bs=pa?pol(H,pa,m):{x:H.x,y:H.y};an.forEach((d,q)=>hs.push({t,B:Bs,P:pol(H,a,d),inc:c>1?q+1:0}));});
+  pos.he=hs.slice(0,nE);pos.hf=hs.slice(nE);
+  const nt=sizeOf(r.toe);j=0;pos.toe=[];
+  r.toe.forEach(([t,c])=>{const an=[];for(let q=0;q<c;q++){an.push(270+(j+.5)*180/nt);j++;}const m=an.reduce((x,y)=>x+y)/c,Bs=pb?pol(T,pb,m):{x:T.x,y:T.y};an.forEach((d,q)=>pos.toe.push({t,B:Bs,P:pol(T,b,d),inc:c>1?q+1:0}));});
+  pos.top=r.top.map(([t],q)=>{const x=H.x+s*(q+1);return{t,B:{x,y:H.y-off(pa,pb,x)},P:{x,y:H.y-off(a,b,x)},inc:0};});
+  pos.bot=r.bot.map(([t],q)=>{const x=T.x-s*(q+1);return{t,B:{x,y:H.y+off(pa,pb,x)},P:{x,y:H.y+off(a,b,x)},inc:0};});
+  const list=[];['hf','top','toe','bot','he'].forEach(seg=>pos[seg].forEach((st,q)=>list.push(Object.assign(st,{seg,q}))));
+  return {k,a,b,total:r.total,list};});
+ return {H,T,s,pxc,z,A,B,chain,rounds,rx:Math.min(7,s*.38)};}
+
+function ovalPatternLines(O){const li=[`<b>Цепочка:</b> ${O.n+1} в. п. (ch), длина без петли подъёма ≈ ${cm(O.chainCm)} см.`];
+ O.R.forEach(r=>{const t=r.k===1?`1 сбн (sc) во 2-ю петлю от крючка; ${O.S} сбн по цепочке; 3 сбн в последнюю петлю; ${O.S} сбн по другой стороне цепочки; 2 сбн в первую петлю (где уже стоит 1)`
+  :`пятка: ${describe(r.hf)}; сторона: ${describe(r.top)}; мысок: ${describe(r.toe)}; сторона: ${describe(r.bot)}; пятка: ${describe(r.he)}`;
+  li.push({k:r.k,html:`<b>Круг ${r.k}:</b> ${t} <b>(итого ${r.total} петель)</b>`});});return li;}
+
+/* ---------- methods ---------- */
+const METHODS=[
+ ['rounds','1. Круги вокруг цепочки','Классика: цепочка и замкнутые круги. Проще всего считать и проверять.'],
+ ['spiral','2. Овал по спирали','Тот же счёт, но без соединительных столбиков и подъёма: нет шва-ступеньки. Нужен маркер начала круга.'],
+ ['rows','3. Поворотными рядами','Ряды туда-обратно от пятки к мыску, в конце обвязка по кругу. Форму легко подогнать по следу стопы.'],
+ ['double','4. Двойная подошва','Две одинаковые подошвы, между ними войлок, край провязывается через оба слоя. Тепло и прочно.'],
+ ['insole','5. Обвязка готовой стельки','Покупная стелька с отверстиями по краю, первый круг сбн в каждое отверстие. Самый прочный вариант.'],
+ ['cord','6. Из шнура по спирали','Шнур или коса из трикотажной пряжи укладывается овалом и сшивается. Похоже на подошву эспадрилий.']];
+let method=store.get('petelka.method','rounds');if(!METHODS.some(m=>m[0]===method))method='rounds';
+const mb=METHODS.map(([id,label])=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>{method=id;store.set('petelka.method',id);regen();};$('methods').appendChild(b);return [id,b];});
+
+const TIP={chain:'Вяжите цепочку свободно: тугая цепочка стянет край подошвы.',
+ r1hf:'Первый столбик пятки. Ещё 2 довяжете в эту же петлю в самом конце круга.',
+ r1top:'Вяжите под одну верхнюю нить цепочки, нижняя понадобится для обратной стороны.',
+ r1toe:'3 столбика в последнюю петлю цепочки разворачивают работу на другую сторону.',
+ r1bot:'Теперь крючок вводится в свободные нижние нити тех же петель цепочки.',
+ r1he:'Последние 2 столбика ложатся в ту же петлю, что и первый. На пятке 3.',
+ inc:'Прибавка: 2 столбика в одну петлю. Если закругление волнится, прибавок слишком много; если загибается чашкой, мало.',
+ side:'Высота столбиков растёт к мыску: сбн, затем пссн, затем ссн. Так подошва плавно расширяется.',
+ sl:'Соединительный столбик и петля подъёма не входят в счёт петель.',
+ spiral:'Маркер показывает начало круга. В спирали без него легко сбиться со счёта.',
+ rowsTurn:'Петля подъёма в начале ряда не считается. Не вяжите в неё в конце следующего ряда, иначе полотно расползётся.',
+ rowsInc:'Прибавки делайте в первую и последнюю петлю ряда: край останется ровным.',
+ rowsDec:'Убавки в начале и в конце ряда закругляют мысок.',
+ edge:'На боковых краях 1 сбн в конец каждого ряда. Волнится — пропускайте иногда ряд; стягивает — добавьте лишний сбн.',
+ corner:'3 сбн в угловую петлю скругляют угол.',
+ join:'Вводите крючок сразу через петлю верхней и нижней подошвы, совмещая их петля в петлю.',
+ hole:'Если трикотажная пряжа не проходит в отверстие, сначала обвяжите стельку тонкой прочной пряжей и провязывайте уже её петли.',
+ cordLay:'Витки укладывайте плотно, без зазоров, но не натягивайте: на закруглениях шнур слегка растягивают, иначе подошва выгнется «тарелкой».',
+ end:'Оставьте хвост 15 см, протяните через петлю на крючке и спрячьте иглой с широким ушком.'};
+
+/* ---------- state ---------- */
+const svg=$('chart');let steps=[],cur=0,timer=null,jb=[],J=[],GEN=null;
+
+function readInputs(){const f=+$('footLen').value,a=+$('allow').value,s=+$('gSt').value,r=+$('gRow').value,hs=+$('holeStep').value,hi=+$('holeInset').value,cw=+$('cordW').value;
+ if(!(f>=12&&f<=33))return 'Длина стопы должна быть от 12 до 33 см.';
+ if(!(s>=4&&s<=30)||!(r>=4&&r<=35))return 'Проверьте плотность: 4–30 петель и 4–35 рядов в 10 см.';
+ if(!(a>=0&&a<=2))return 'Запас по длине: от 0 до 2 см.';
+ if(method==='insole'&&!(hs>=0.5&&hs<=2&&hi>=0.3&&hi<=1.2))return 'Шаг отверстий 0,5–2 см, отступ 0,3–1,2 см.';
+ if(method==='cord'&&!(cw>=0.5&&cw<=3))return 'Ширина шнура: от 0,5 до 3 см.';
+ return {foot:f,allow:a,st10:s,row10:r,holeStep:hs,holeInset:hi,cordW:cw};}
+
+function regen(){mb.forEach(([id,b])=>b.setAttribute('aria-pressed',id===method));
+ const m=METHODS.find(x=>x[0]===method);$('methodNote').textContent=m[2];
+ $('fHole').hidden=$('fInset').hidden=method!=='insole';$('fCord').hidden=method!=='cord';$('fSt').hidden=$('fRow').hidden=method==='insole'||method==='cord';
+ const inp=readInputs();if(typeof inp==='string'){$('genErr').textContent=inp;$('genErr').hidden=false;return;}$('genErr').hidden=true;
+ store.set('petelka.gen',inp);
+ svg.innerHTML='';steps=[];
+ const ctx={layer:mk('g',{},svg),base:null};ctx.base=mk('g',{},ctx.layer);
+ GEN=BUILDERS[method](inp,ctx);
+ $('genStats').innerHTML=GEN.stats.map(([a,b])=>`<span class="chip">${a} <b>${b}</b></span>`).join('');
+ $('patList').innerHTML=GEN.lines.map(x=>typeof x==='string'?`<li>${x}</li>`:`<li style="border-color:${COLN(x.k)}">${x.html}</li>`).join('');
+ mk('text',{x:GEN.labels[0][0],y:GEN.labels[0][1],'text-anchor':'end','font-size':13,fill:'var(--muted)','font-family':'Manrope,sans-serif'},svg).textContent='пятка';
+ mk('text',{x:GEN.labels[1][0],y:GEN.labels[1][1],'font-size':13,fill:'var(--muted)','font-family':'Manrope,sans-serif'},svg).textContent='мысок';
+ const hook=mk('g',{id:'hook'},svg);mk('circle',{id:'hookdot',r:6,fill:'none',stroke:'var(--hook)','stroke-width':2},hook);
+ J=[];steps.forEach((s,i)=>{if(s.jump)J.push([s.jump,i]);});
+ $('jump').innerHTML='';jb=J.map(([l,i])=>{const b=document.createElement('button');b.className='btn';b.style.padding='6px 12px';b.style.fontSize='13px';b.textContent=l;b.onclick=()=>{stop();go(i);};$('jump').appendChild(b);return b;});
+ $('scrub').max=steps.length-1;
+ const lg=$('legend');lg.innerHTML='';GEN.legend.forEach(([t,l])=>{const w=document.createElement('span');if(t)w.appendChild(iconSvg(t));w.appendChild(document.createTextNode(l));lg.appendChild(w);});
+ cur=0;stop();render();}
+
+function addStep(ctx,o){o.g=mk('g',{stroke:COLN(o.c),fill:'none'},ctx.layer);steps.push(o);return o;}
+
+/* ---------- builder: oval (rounds / spiral) ---------- */
+function ovalSteps(O,G,ctx,spiral,prefix){prefix=prefix||'';
+ G.chain.forEach((p,i0)=>{const i=i0+1,last=i===O.n+1;
+  const o=addStep(ctx,{c:0,type:'ch',stage:prefix+'Цепочка',seg:'',P:p,jump:i===1?prefix+'Цепочка':null,act:last?`Воздушная петля ${i}: петля подъёма`:`Воздушная петля ${i}`,
+   where:i===1?'Сделайте скользящую петлю и наденьте её на крючок. Здесь будет мысок.':last?'Эта петля не считается: круг 1 начнётся со 2-й петли от крючка.':'Продолжайте цепочку.',tip:TIP.chain,cnt:`в. п. ${i} / ${O.n+1}`});
+  mk('ellipse',{cx:p.x,cy:p.y,rx:G.rx,ry:G.rx*.57,'stroke-width':1.3,'stroke-dasharray':last?'2 2':null},o.g);});
+ const SEG={hf:'Пятка',top:'Сторона к мыску',toe:'Мысок',bot:'Сторона к пятке',he:'Пятка, конец круга'};
+ G.rounds.forEach(r=>{const k=r.k,stage=prefix+'Круг '+k;let jumped=false;
+  if(k>1&&!spiral){const d=pol(G.H,r.a-3*G.z,180);const o=addStep(ctx,{c:k,type:'ch',stage,seg:'Подъём',P:d,jump:prefix+'Круг '+k,act:'1 воздушная петля подъёма',where:'Она не считается. Первый столбик круга вяжите в ту же петлю, куда сделан соединительный столбик.',tip:TIP.sl,cnt:`0 / ${r.total}`});
+   mk('ellipse',{cx:d.x-6*G.z,cy:d.y,rx:5*G.z,ry:3*G.z,'stroke-width':1.2,'stroke-dasharray':'2 2'},o.g);jumped=true;}
+  r.list.forEach((st,i)=>{const n=i+1,seg=st.seg,q=st.q;let where,tip;
+   if(k===1){
+    if(seg==='hf')where='Во 2-ю воздушную петлю от крючка.';
+    else if(seg==='top')where=q===0?'В следующую петлю цепочки, под верхнюю нить.':'В следующую петлю цепочки.';
+    else if(seg==='toe')where=q===0?'В последнюю петлю цепочки (здесь будет 3 столбика).':`В ту же последнюю петлю цепочки (${q+1} из 3).`;
+    else if(seg==='bot')where=q===0?'Поверните работу: следующая петля по другой стороне цепочки, под нижнюю нить.':'В следующую петлю по другой стороне цепочки.';
+    else where=q===0?'В ту петлю цепочки, где стоит первый столбик круга.':(spiral?'В ту же петлю (на пятке 3). Не замыкайте круг: сразу продолжайте круг 2.':'В ту же петлю (на пятке теперь 3).');
+    tip=TIP['r1'+seg];
+   }else{
+    if(n===1)where=spiral?'Сразу в первую петлю предыдущего круга, без подъёма. Переставьте маркер в этот столбик.':'В первую петлю круга, туда же, где соединительный столбик.';
+    else where=st.inc===2?'Ещё раз в ту же петлю: вторая половина прибавки.':'В следующую петлю предыдущего круга.';
+    tip=n===1&&spiral?TIP.spiral:st.inc?TIP.inc:TIP.side;}
+   let act=NAME[st.t];if(st.inc===1)act+=': прибавка, 1-й';if(st.inc===2)act+=': прибавка, 2-й';
+   const o=addStep(ctx,{c:k,type:st.t,stage,seg:SEG[seg],P:st.P,jump:!jumped&&n===1?prefix+'Круг '+k:null,act,where,tip,cnt:`петля ${n} / ${r.total}`});
+   glyph(o.g,st.t,st.B,st.P,G.z);
+   if(spiral&&n===1&&k>1)mk('path',{d:`M${st.P.x-5} ${st.P.y-12}L${st.P.x+5} ${st.P.y-12}L${st.P.x} ${st.P.y-5}Z`,fill:COLN(k),stroke:'none'},o.g);});
+  if(!spiral){const d=pol(G.H,r.a+4*G.z,180);const o=addStep(ctx,{c:k,type:'sl',stage,seg:'Замыкание круга',P:d,act:`Соединительный столбик: круг ${k} закрыт`,where:`В первую петлю этого круга. Проверьте счёт: ${r.total} петель.`,tip:TIP.sl,cnt:`${r.total} / ${r.total}`});
+   mk('circle',{cx:d.x,cy:d.y,r:3.2*G.z,fill:COLN(k),stroke:'none'},o.g);}
+  else if(k===O.K){const f=r.list[0].P;
+   addStep(ctx,{c:k,type:'hdc',stage,seg:'Сглаживание',P:f,act:'1 полустолбик (hdc) в следующую петлю',where:'Это выравнивает переход между последним и предыдущим кругом.',tip:TIP.spiral,cnt:'сглаживание'});
+   const o=addStep(ctx,{c:k,type:'sl',stage,seg:'Сглаживание',P:f,act:'1 соединительный столбик в следующую петлю',where:'Спираль закончена, ступенька сглажена.',tip:TIP.sl,cnt:'сглаживание'});
+   mk('circle',{cx:f.x,cy:f.y-8,r:3.2*G.z,fill:COLN(k),stroke:'none'},o.g);}});}
+
+function ovalLegend(extra){return [['ch','в. п. (ch)'],['sc','сбн (sc)'],['hdc','пссн (hdc)'],['dc','ссн (dc)']].concat(extra||[]).concat([[null,'веер из 2 знаков = прибавка']]);}
+function ovalCounter(O,prefix){return {labels:[prefix+'Цепочка'].concat(O.R.map(r=>prefix+'Круг '+r.k)),targets:[O.n+1].concat(O.R.map(r=>r.total))};}
+function ovalStats(O){const last=O.R[O.R.length-1];return [['Цепочка',(O.n+1)+' в. п.'],['Длина цепочки','≈'+cm(O.chainCm)+' см'],['Кругов',O.K],['Последний круг',last.total+' п.'],['Длина подошвы','≈'+cm(O.L)+' см'],['Пятка / мысок','≈'+cm(O.heelW)+' / '+cm(O.toeW)+' см']];}
+
+const BUILDERS={};
+BUILDERS.rounds=(p,ctx)=>{const O=buildOval(p),G=ovalGeom(O);ovalSteps(O,G,ctx,false);
+ const last=steps[steps.length-1];addStep(ctx,{c:O.K,type:'end',stage:'Финиш',seg:'',P:last.P,act:'Подошва готова',where:`Приложите к стопе: длина около ${cm(O.L)} см.`,tip:TIP.end,cnt:'готово'});
+ const lines=ovalPatternLines(O);lines.forEach(x=>{if(typeof x!=='string')x.html=x.html.replace('<b>(итого','; соед. ст. (sl st) <b>(итого').replace(/<b>Круг (\d+):<\/b> /,(m,k)=>k>1?`${m}1 в. п. подъёма, `:m);});
+ return {stats:ovalStats(O),lines,labels:[[92,154],[608,154]],legend:ovalLegend([['sl','соед. ст. (sl st)']]),counter:ovalCounter(O,'')};};
+BUILDERS.spiral=(p,ctx)=>{const O=buildOval(p),G=ovalGeom(O);ovalSteps(O,G,ctx,true);
+ const last=steps[steps.length-1];addStep(ctx,{c:O.K,type:'end',stage:'Финиш',seg:'',P:last.P,act:'Подошва готова',where:`Приложите к стопе: длина около ${cm(O.L)} см. Пятка может сместиться на 1–2 петли вбок, это нормально для спирали.`,tip:TIP.end,cnt:'готово'});
+ const lines=ovalPatternLines(O);lines.push('<b>Окончание:</b> 1 пссн (hdc), 1 соед. ст. (sl st) в следующие петли, чтобы сгладить ступеньку.');
+ lines.splice(1,0,'Круги не замыкаются и петли подъёма нет. Первую петлю каждого круга отмечайте маркером.');
+ return {stats:ovalStats(O),lines,labels:[[92,154],[608,154]],legend:ovalLegend([['marker','маркер начала круга']]),counter:ovalCounter(O,'')};};
+
+/* ---------- builder: rows ---------- */
+BUILDERS.rows=(p,ctx)=>{const L=p.foot+p.allow,w=10/p.st10,h=10/p.row10;
+ const R=Math.max(6,Math.round((L-2*h)/h)),n1=Math.max(3,Math.round((0.28*L-2*h)/w)),n2=Math.max(n1+1,Math.round((0.37*L-2*h)/w));
+ const rows=[];const first=Math.max(2,n1-2);rows.push(first);rows.push(n1);
+ const incAt=Math.round(R*.5);while(rows.length<R){const cur=rows[rows.length-1],i=rows.length;
+  if(i>=R-2){rows.push(Math.max(2,cur-2));continue;}
+  if(i>=incAt&&cur<n2){rows.push(Math.min(n2,cur+2));continue;}rows.push(cur);}
+ const nLast=rows[R-1],edgeTot=first+nLast+2*R+4;
+ const x0=110,dx=Math.min(24,440/(R+1)),cy=150,maxN=Math.max(...rows),dy=Math.min(20,190/(maxN+3)),z=Math.max(.45,Math.min(1,Math.min(dx,dy)/19));
+ const X=r=>x0+r*dx,Y=(n,i)=>cy-(n-1)*dy/2+i*dy;
+ const rowText=r=>{const n=rows[r],pv=r?rows[r-1]:first,d=n-pv;
+  if(r===0)return `${n} сбн (sc), начиная со 2-й в. п. от крючка`;
+  if(d===2)return `прибавка (inc), ${pv-2} сбн, прибавка`;if(d===1)return `${pv-1} сбн, прибавка (inc)`;
+  if(d===-2)return `убавка (dec), ${pv-4} сбн, убавка`;if(d===-1)return `${pv-2} сбн, убавка (dec)`;return `${n} сбн (sc)`;};
+ const lines=[`<b>Цепочка:</b> ${first+1} в. п. (${first} + 1 подъёма).`];
+ const plain=r=>r>0&&rows[r]===rows[r-1];
+ let gi=0;while(gi<R){let gj=gi;if(plain(gi)){while(gj+1<R&&plain(gj+1))gj++;}
+  const k=rows[gi]>(gi?rows[gi-1]:first)?2:rows[gi]<(gi?rows[gi-1]:first)?3:1;
+  lines.push({k,html:`<b>${gj>gi?'Ряды '+(gi+1)+'–'+(gj+1):'Ряд '+(gi+1)}:</b> ${gi>0?'1 в. п. подъёма, ':''}${rowText(gi)} <b>(итого ${rows[gi]})</b>`});gi=gj+1;}
+ lines.push({k:4,html:`<b>Обвязка:</b> 1 в. п., по кругу сбн: 3 сбн в каждый угол, по 1 сбн в конец каждого ряда и в каждую петлю торцов; соед. ст. <b>(итого ${edgeTot})</b>`});
+ for(let i=0;i<=first;i++){const y=Y(first+1,i),last=i===first;const o=addStep(ctx,{c:0,type:'ch',stage:'Цепочка',seg:'',P:{x:x0-dx,y},jump:i===0?'Цепочка':null,act:`Воздушная петля ${i+1}${last?': петля подъёма':''}`,where:i===0?'Скользящая петля на крючке. Цепочка — это край пятки.':last?'Не считается: ряд 1 начинается со 2-й петли от крючка.':'Продолжайте цепочку.',tip:TIP.chain,cnt:`в. п. ${i+1} / ${first+1}`});
+  mk('ellipse',{cx:x0-dx,cy:y,rx:Math.min(4,dy*.25),ry:Math.min(7,dy*.4),'stroke-width':1.3,'stroke-dasharray':last?'2 2':null},o.g);}
+ rows.forEach((n,r)=>{const pv=r?rows[r-1]:first,d=n-pv,c=d>0?2:d<0?3:1,x=X(r),down=r%2===0,stage='Ряд '+(r+1);
+  if(r>0){const y=down?Y(n,0)-dy*.8:Y(n,n-1)+dy*.8;const o=addStep(ctx,{c,type:'ch',stage,seg:'Подъём',P:{x,y},jump:(r+1)%5===0||r===R-1?stage:null,act:'1 воздушная петля подъёма и поворот работы',where:'Переверните полотно и провяжите 1 в. п.',tip:TIP.rowsTurn,cnt:`0 / ${n}`});
+   mk('ellipse',{cx:x,cy:y,rx:Math.min(4,dx*.2),ry:Math.min(6,dy*.3),'stroke-width':1.2,'stroke-dasharray':'2 2'},o.g);}
+  for(let i=0;i<n;i++){const ii=down?i:n-1-i,y=Y(n,ii);let t='sc',act=NAME.sc,where='В следующую петлю предыдущего ряда.',tip=c===1?TIP.rowsTurn:c===2?TIP.rowsInc:TIP.rowsDec;
+   if(r===0)where=i===0?'Во 2-ю петлю от крючка.':'В следующую петлю цепочки.';
+   if(d>0&&(i<=1&&d===2)||(d>0&&i>=n-2)){act=NAME.sc+': прибавка';where=(i===0||i===n-2)?'В крайнюю петлю ряда, 1-й из двух.':'Ещё раз в ту же петлю.';}
+   if(d<0&&((d===-2&&i===0)||i===n-1)){act='Убавка (dec): 2 петли вместе';t='sc';where='Провяжите 2 крайние петли вместе.';}
+   const o=addStep(ctx,{c,type:act.startsWith('Убавка')?'dec':t,stage,seg:c===2?'Прибавки':c===3?'Убавки':'',P:{x:x+dx*.35,y},jump:r===0&&i===0?'Ряд 1':null,act,where,tip,cnt:`петля ${i+1} / ${n}`});
+   glyph(o.g,'sc',{x:x-dx*.4,y},{x:x+dx*.4,y},z);}});
+ const top=r=>Y(rows[r],0)-dy*.5,bot=r=>Y(rows[r],rows[r]-1)+dy*.5,xR=X(R-1),endTop=(R%2===0);const E=[];
+ const corner=(C,ang,label)=>{[-40,0,40].forEach(a=>{const d=pol(C,dy*.9,ang+a);E.push({B:C,P:d,where:label});});};
+ const tl={x:xR+dx*.4,y:top(R-1)},bl={x:xR+dx*.4,y:bot(R-1)},ht={x:x0-dx*1.3,y:Y(first+1,0)-dy*.3},hb={x:x0-dx*1.3,y:Y(first+1,first)+dy*.3};
+ const sideTop=()=>{for(let r=R-2;r>=1;r--){const b={x:X(r),y:top(r)};E.push({B:b,P:{x:b.x,y:b.y-dy*.9},where:'1 сбн в конец ряда.'});}};
+ const sideBot=()=>{for(let r=1;r<=R-2;r++){const b={x:X(r),y:bot(r)};E.push({B:b,P:{x:b.x,y:b.y+dy*.9},where:'1 сбн в конец ряда.'});}};
+ const heelEnd=()=>{for(let i=1;i<first-1;i++){const b={x:x0-dx*1.3,y:Y(first+1,i)};E.push({B:b,P:{x:b.x-dx*.9,y:b.y},where:'В свободную петлю цепочки.'});}};
+ const toeEnd=up=>{for(let i=1;i<nLast-1;i++){const ii=up?nLast-1-i:i,b={x:xR+dx*.4,y:Y(nLast,ii)};E.push({B:b,P:{x:b.x+dx*.9,y:b.y},where:'В следующую петлю последнего ряда.'});}};
+ if(endTop){corner(tl,-45,'3 сбн в угловую петлю.');sideTop();corner(ht,-135,'3 сбн в угол цепочки.');heelEnd();corner(hb,135,'3 сбн в угол цепочки.');sideBot();corner(bl,45,'3 сбн в угловую петлю.');toeEnd(true);}
+ else{corner(bl,45,'3 сбн в угловую петлю.');sideBot2();}
+ function sideBot2(){for(let r=R-2;r>=1;r--){const b={x:X(r),y:bot(r)};E.push({B:b,P:{x:b.x,y:b.y+dy*.9},where:'1 сбн в конец ряда.'});}
+  corner(hb,135,'3 сбн в угол цепочки.');for(let i=first-2;i>=1;i--){const b={x:x0-dx*1.3,y:Y(first+1,i)};E.push({B:b,P:{x:b.x-dx*.9,y:b.y},where:'В свободную петлю цепочки.'});}
+  corner(ht,-135,'3 сбн в угол цепочки.');for(let r=1;r<=R-2;r++){const b={x:X(r),y:top(r)};E.push({B:b,P:{x:b.x,y:b.y-dy*.9},where:'1 сбн в конец ряда.'});}
+  corner(tl,-45,'3 сбн в угловую петлю.');toeEnd(false);}
+ E.forEach((e,i)=>{const o=addStep(ctx,{c:4,type:'sc',stage:'Обвязка',seg:e.where.startsWith('3')?'Угол':'',P:e.P,jump:i===0?'Обвязка':null,act:NAME.sc,where:i===0?'Не отрывая нить, 1 в. п. и '+e.where.toLowerCase():e.where,tip:e.where.startsWith('3')?TIP.corner:TIP.edge,cnt:`петля ${i+1} / ${edgeTot}`});glyph(o.g,'sc',e.B,e.P,z*.9);});
+ const f=E[0].B;const o=addStep(ctx,{c:4,type:'sl',stage:'Обвязка',seg:'Замыкание',P:f,act:'Соединительный столбик в первую петлю обвязки',where:`Проверьте счёт: ${edgeTot} петель.`,tip:TIP.sl,cnt:`${edgeTot} / ${edgeTot}`});mk('circle',{cx:f.x,cy:f.y,r:3,fill:COLN(4),stroke:'none'},o.g);
+ addStep(ctx,{c:4,type:'end',stage:'Финиш',seg:'',P:f,act:'Подошва готова',where:`Размер после обвязки ≈ ${cm(L)} × ${cm(n1*w+2*h)} / ${cm(n2*w+2*h)} см.`,tip:TIP.end,cnt:'готово'});
+ return {stats:[['Цепочка',(first+1)+' в. п.'],['Рядов',R],['Пятка / мысок',n1+' / '+n2+' п.'],['Обвязка',edgeTot+' п.'],['Размер','≈'+cm(L)+' × '+cm(n1*w+2*h)+' / '+cm(n2*w+2*h)+' см']],
+  lines,labels:[[x0-dx*2.6,154],[xR+dx*2.2,154]],legend:[['ch','в. п. (ch)'],['sc','сбн (sc)'],[null,'зелёный — прибавки, оранжевый — убавки, синий — обвязка']],
+  counter:{labels:['Цепочка'].concat(rows.map((_,r)=>'Ряд '+(r+1)),['Обвязка']),targets:[first+1].concat(rows,[edgeTot])}};};
+
+/* ---------- builder: double ---------- */
+BUILDERS.double=(p,ctx)=>{const O=buildOval(p),G=ovalGeom(O);
+ const bg=mk('g',{stroke:'var(--muted)',fill:'none',opacity:.45},ctx.base);
+ G.chain.forEach(c=>mk('ellipse',{cx:c.x,cy:c.y,rx:G.rx,ry:G.rx*.57,'stroke-width':1},bg));G.rounds.forEach(r=>r.list.forEach(st=>glyph(bg,st.t,st.B,st.P,G.z)));
+ const lastR=G.rounds[G.rounds.length-1],tot=lastR.total,hc=G.H,tc=G.T;
+ addStep(ctx,{c:1,type:'prep',stage:'Подготовка',seg:'',P:hc,jump:'Подготовка',act:'Свяжите подошву 1',where:'По схеме «Круги вокруг цепочки» на вкладке 1. Она показана на рисунке бледным.',tip:'Для двойной подошвы обе детали должны совпадать петля в петлю: вяжите их одним крючком и с одинаковым натяжением.',cnt:'1 / 4'});
+ addStep(ctx,{c:1,type:'prep',stage:'Подготовка',seg:'',P:tc,act:'Свяжите такую же подошву 2',where:`В последнем круге у обеих деталей должно быть ${tot} петель.`,tip:'Если счёт разошёлся хотя бы на 1 петлю, край при соединении перекосит.',cnt:'2 / 4'});
+ const fo=addStep(ctx,{c:5,type:'prep',stage:'Подготовка',seg:'',P:{x:(hc.x+tc.x)/2,y:hc.y},act:'Вырежьте войлочную стельку',where:'Обведите подошву на войлоке или фетре и вырежьте на 0,5 см меньше по всему контуру.',tip:'Войлок 3–5 мм делает тапочки тёплыми и не даёт подошве растягиваться.',cnt:'3 / 4'});
+ const fa=Math.max(4,lastR.a-G.pxc*.9),fb=Math.max(4,lastR.b-G.pxc*.9);
+ mk('path',{d:`M${hc.x} ${hc.y-fa}L${tc.x} ${tc.y-fb}A${fb} ${fb} 0 0 1 ${tc.x} ${tc.y+fb}L${hc.x} ${hc.y+fa}A${fa} ${fa} 0 0 1 ${hc.x} ${hc.y-fa}Z`,fill:'var(--felt)','fill-opacity':.18,stroke:'var(--felt)','stroke-width':1.3,'stroke-dasharray':'4 3'},fo.g);
+ addStep(ctx,{c:1,type:'prep',stage:'Подготовка',seg:'',P:hc,act:'Сложите детали',where:'Подошвы изнанками внутрь, войлок между ними. Совместите пятки и мыски, скрепите булавками или клипсами.',tip:'Лицевая сторона подошвы 1 смотрит вверх, подошвы 2 — вниз.',cnt:'4 / 4'});
+ lastR.list.forEach((st,i)=>{let dx=st.P.x-st.B.x,dy=st.P.y-st.B.y,l=Math.hypot(dx,dy)||1;const Pn={x:st.P.x+dx/l*G.pxc*O.h*.9,y:st.P.y+dy/l*G.pxc*O.h*.9};
+  const o=addStep(ctx,{c:2,type:'sc',stage:'Соединение',seg:'',P:Pn,jump:i===0?'Соединение':null,act:NAME.sc+' через оба слоя',where:i===0?'Присоедините нить у пятки, 1 в. п., крючок сразу через петли обеих подошв.':'В следующую пару петель обеих подошв.',tip:TIP.join,cnt:`петля ${i+1} / ${tot}`});glyph(o.g,'sc',st.P,Pn,G.z);});
+ const f=lastR.list[0].P;const o=addStep(ctx,{c:2,type:'sl',stage:'Соединение',seg:'Замыкание',P:f,act:'Соединительный столбик',where:`В первую петлю круга соединения. Итого ${tot} петель. Этот круг — основа для верха тапочек.`,tip:TIP.sl,cnt:`${tot} / ${tot}`});mk('circle',{cx:f.x,cy:f.y-6,r:3,fill:COLN(2),stroke:'none'},o.g);
+ addStep(ctx,{c:2,type:'end',stage:'Финиш',seg:'',P:f,act:'Двойная подошва готова',where:'Можно сразу вязать верх от круга соединения.',tip:TIP.end,cnt:'готово'});
+ const lines=ovalPatternLines(O);lines.unshift('<b>Свяжите 2 одинаковые подошвы:</b>');
+ lines.push('<b>Войлок:</b> вырезать по контуру подошвы на 0,5 см меньше.');
+ lines.push({k:2,html:`<b>Соединение:</b> сложить изнанками внутрь с войлоком между ними; 1 в. п., сбн через петли обеих подошв по кругу, соед. ст. <b>(итого ${tot})</b>`});
+ const oc=ovalCounter(O,'');
+ return {stats:[['Подошв',2],['Цепочка',(O.n+1)+' в. п.'],['Последний круг',tot+' п.'],['Соединение',tot+' п.'],['Размер','≈'+cm(O.L)+' × '+cm(O.toeW)+' см'],['Расход','×2 к одинарной']],
+  lines,labels:[[92,154],[608,154]],legend:[['sc','сбн (sc) соединения'],['sl','соед. ст. (sl st)'],[null,'бледная — готовая подошва, пунктир — войлок']],
+  counter:{labels:oc.labels.map(l=>'Подошва 1: '+l).concat(oc.labels.map(l=>'Подошва 2: '+l),['Соединение']),targets:oc.targets.concat(oc.targets,[tot])}};};
+
+/* ---------- builder: insole ---------- */
+BUILDERS.insole=(p,ctx)=>{const L=p.foot+p.allow,rhC=0.14*L,rtC=0.185*L,DC=L-rhC-rtC,st=p.holeStep,ins=p.holeInset;
+ const pxc=Math.min(460/L,230/(2*rtC)),hc={x:120+rhC*pxc,y:150},tc={x:hc.x+DC*pxc,y:150},rh=rhC*pxc,rt=rtC*pxc;
+ function pt(u,o){const s=Math.floor(u)%4,f=u-Math.floor(u);if(s===0)return pol(hc,rh+o,90+180*f);
+  if(s===1)return{x:hc.x+(tc.x-hc.x)*f,y:(hc.y-(rh+o))+((tc.y-(rt+o))-(hc.y-(rh+o)))*f};
+  if(s===2)return pol(tc,rt+o,270+180*f);return{x:tc.x+(hc.x-tc.x)*f,y:(tc.y+(rt+o))+((hc.y+(rh+o))-(tc.y+(rt+o)))*f};}
+ let d='';for(let u=0;u<4;u+=.02){const q=pt(u,0);d+=(u?'L':'M')+q.x.toFixed(1)+' '+q.y.toFixed(1);}
+ const io=-ins*pxc,lens=[Math.PI*(rhC-ins),Math.hypot(DC,rtC-rhC),Math.PI*(rtC-ins),Math.hypot(DC,rtC-rhC)],perim=lens.reduce((a,b)=>a+b);
+ const N=Math.max(12,Math.round(perim/st));const H=[];let acc=0;
+ lens.forEach((len,sg)=>{const cnt=sg===3?N-acc:Math.round(N*len/perim);acc+=cnt;for(let i=0;i<cnt;i++)H.push(sg+(i+.5)/cnt);});
+ let s0=H.findIndex(u=>u>=.5);if(s0<0)s0=0;const order=H.slice(s0).concat(H.slice(0,s0));
+ mk('path',{d:d+'Z',fill:'var(--felt)','fill-opacity':.14,stroke:'var(--felt)','stroke-width':1.3},ctx.base);
+ const z=Math.max(.5,Math.min(1,pxc*st/16));
+ const mo=addStep(ctx,{c:5,type:'prep',stage:'Подготовка',seg:'',P:pt(0.5,io),jump:'Разметка',act:'Разметьте отверстия',where:`Отступите ${cm(ins)} см от края и ставьте точки через ${cm(st)} см. Всего ${N} точек.`,tip:'На закруглениях точки чуть чаще, чем на прямых боках: так подошва не перекосится.',cnt:'1 / 2'});
+ H.forEach(u=>{const q=pt(u,io);mk('circle',{cx:q.x,cy:q.y,r:2*z,fill:'none',stroke:'var(--felt)','stroke-width':1},mo.g);});
+ addStep(ctx,{c:5,type:'prep',stage:'Подготовка',seg:'',P:pt(0.5,io),act:'Проколите отверстия',where:'Шилом или дыроколом для кожи. У толстого войлока отверстия можно обметать прочной ниткой.',tip:TIP.hole,cnt:'2 / 2'});
+ order.forEach((u,i)=>{const a=pt(u,io),b=pt(u,io+Math.max(10,pxc*1.1));const o=addStep(ctx,{c:2,type:'sc',stage:'Круг 1',seg:u%4<1?'Пятка':u%4<2?'Сторона':u%4<3?'Мысок':'Сторона',P:b,jump:i===0?'Круг 1':null,act:NAME.sc,where:i===0?'Присоедините нить в отверстие на середине пятки: крючок в отверстие, вытянуть петлю, 1 в. п., затем 1 сбн в это же отверстие.':'В следующее отверстие.',tip:TIP.hole,cnt:`петля ${i+1} / ${N}`});glyph(o.g,'sc',a,b,z);});
+ const f=pt(order[0],io+Math.max(10,pxc*1.1));const o=addStep(ctx,{c:2,type:'sl',stage:'Круг 1',seg:'Замыкание',P:f,act:'Соединительный столбик',where:`В первую петлю круга. Итого ${N} петель — от них вяжется верх.`,tip:TIP.sl,cnt:`${N} / ${N}`});mk('circle',{cx:f.x,cy:f.y,r:3,fill:COLN(2),stroke:'none'},o.g);
+ addStep(ctx,{c:2,type:'end',stage:'Финиш',seg:'',P:f,act:'Основа готова',where:'Дальше вяжите верх тапочек прямо от этого круга.',tip:TIP.end,cnt:'готово'});
+ return {stats:[['Длина стельки','≈'+cm(L)+' см'],['Ширина пятка / мысок','≈'+cm(2*rhC)+' / '+cm(2*rtC)+' см'],['Отверстий',N],['Шаг',cm(st)+' см'],['Круг 1',N+' п.']],
+  lines:[`<b>Стелька:</b> размер ${Math.round((p.foot+1.5)*1.5)}, длина около ${cm(L)} см. Лучше войлочная или с тонким резиновым низом.`,`<b>Разметка:</b> ${N} точек через ${cm(st)} см в ${cm(ins)} см от края, проколоть шилом.`,
+   {k:2,html:`<b>Круг 1:</b> присоединить нить у пятки, 1 в. п., по 1 сбн (sc) в каждое отверстие, соед. ст. (sl st) <b>(итого ${N})</b>`},'<b>Дальше:</b> верх тапочек вяжется от этого круга.'],
+  labels:[[hc.x-rh-10,154],[tc.x+rt+12,154]],legend:[['hole','отверстие'],['sc','сбн (sc) в отверстие'],['sl','соед. ст. (sl st)']],
+  counter:{labels:['Круг 1 (отверстия)'],targets:[N]}};};
+
+/* ---------- builder: cord ---------- */
+BUILDERS.cord=(p,ctx)=>{const L=p.foot+p.allow,cw=p.cordW;const loops=Math.max(2,Math.round(0.14*L/cw)),G=loops*cw,Cn=Math.max(4,L-2.25*G);
+ let total=Cn;for(let j=1;j<=loops;j++){const g=(j-.5)*cw;total+=2*Cn+2.25*Math.PI*g;}total*=1.08;
+ const pxc=Math.min(470/L,220/(2.5*G)),hc={x:110+G*pxc,y:150},tc={x:hc.x+Cn*pxc,y:150};
+ const pt=u=>{const s=Math.floor(u)%4,f=u-Math.floor(u),rh=u/4*cw*pxc,rt=rh*1.25;
+  if(s===0)return pol(hc,rh,90+180*f);if(s===1)return{x:hc.x+(tc.x-hc.x)*f,y:hc.y-rh-(rt-rh)*f};if(s===2)return pol(tc,rt,270+180*f);return{x:tc.x+(hc.x-tc.x)*f,y:tc.y+rt-(rt-rh)*f};};
+ const sw=Math.max(3,Math.min(12,cw*pxc*.8));
+ const seg=(o,u0,u1)=>{let d='';for(let u=u0;u<=u1+1e-6;u+=.02){const q=pt(Math.min(u,u1));d+=(d?'L':'M')+q.x.toFixed(1)+' '+q.y.toFixed(1);}
+  mk('path',{d,stroke:COLN(3),'stroke-width':sw,'stroke-opacity':.5,'stroke-linecap':'round','stroke-linejoin':'round',fill:'none'},o.g);
+  mk('path',{d,stroke:COLN(3),'stroke-width':1,'stroke-dasharray':'2 3',fill:'none'},o.g);};
+ addStep(ctx,{c:3,type:'cord',stage:'Шнур',seg:'',P:tc,jump:'Шнур',act:`Свяжите шнур длиной ≈ ${cm(total/100)} м`,where:`Ширина шнура около ${cm(cw)} см. Можно не вязать всё сразу, а наращивать по ходу укладки.`,tip:'Шнур должен быть плотным и одинаковым по толщине, иначе витки лягут неровно.',cnt:'шнур'});
+ const co=addStep(ctx,{c:3,type:'sew',stage:'Центр',seg:'',P:hc,jump:'Укладка',act:`Уложите центр: прямой отрезок ${cm(Cn)} см`,where:'Начало шнура — у мыска. Сложите шнур в узкую петлю длиной центра и сшейте две половинки между собой.',tip:TIP.cordLay,cnt:'центр'});
+ {let d=`M${tc.x} ${tc.y}L${hc.x} ${hc.y}`;mk('path',{d,stroke:COLN(3),'stroke-width':sw,'stroke-opacity':.5,'stroke-linecap':'round',fill:'none'},co.g);mk('circle',{cx:tc.x,cy:tc.y,r:3,fill:COLN(3),stroke:'none'},co.g);}
+ const SEGN=['вокруг пятки','вдоль стороны к мыску','вокруг мыска','вдоль стороны к пятке'];
+ for(let j=0;j<loops;j++)for(let s=0;s<4;s++){const u0=j*4+s,u1=u0+1,o=addStep(ctx,{c:(j%4)+1,type:'sew',stage:'Виток '+(j+1),seg:SEGN[s],P:pt(u1),jump:s===0?'Виток '+(j+1):null,
+  act:`Уложите шнур ${SEGN[s]}`,where:s===0||s===2?'На закруглении слегка растягивайте шнур и пришивайте чаще, через 1–1,5 см.':'Прижмите шнур к предыдущему витку и пришейте через 2 см.',tip:s%2===0?TIP.cordLay:'Сверяйте ширину со следом стопы, обведённым на бумаге.',cnt:`виток ${j+1} / ${loops}`});seg(o,u0,u1);}
+ const f=pt(loops*4);addStep(ctx,{c:3,type:'sew',stage:'Финиш',seg:'',P:f,act:'Закрепите конец шнура',where:'Конец шнура сведите на нет по боку у пятки и пришейте с изнанки.',tip:'Все швы делайте на изнанке — это будет верхняя сторона, к которой пришивается верх тапочек.',cnt:'готово'});
+ addStep(ctx,{c:3,type:'end',stage:'Финиш',seg:'',P:f,act:'Подошва готова',where:`Размер около ${cm(Cn+2.25*G)} × ${cm(2.5*G)} см.`,tip:TIP.end,cnt:'готово'});
+ return {stats:[['Шнур','≈'+cm(total/100)+' м'],['Центр',cm(Cn)+' см'],['Витков',loops],['Размер','≈'+cm(Cn+2.25*G)+' × '+cm(2.5*G)+' см']],
+  lines:[`<b>Шнур:</b> «гусеничка» или коса шириной ${cm(cw)} см, длиной около ${cm(total/100)} м (с запасом 8%).`,`<b>Центр:</b> прямой сдвоенный отрезок ${cm(Cn)} см, начало у мыска.`,
+   {k:3,html:`<b>Витки 1–${loops}:</b> укладывать шнур овалом вокруг центра, на мыске чуть свободнее, чем на пятке; пришивать через 1,5–2 см.`},'<b>Конец:</b> свести на нет у пятки, закрепить с изнанки.'],
+  labels:[[hc.x-G*pxc-10,154],[tc.x+1.25*G*pxc+12,154]],legend:[['cord','шнур'],[null,'пунктир — линия шнура, цвет — номер витка']],
+  counter:{labels:Array.from({length:loops},(_,j)=>'Виток '+(j+1)),targets:Array.from({length:loops},()=>0)}};};
+
+/* ---------- player ---------- */
+function render(){if(!steps.length)return;
+ steps.forEach((s,i)=>{s.g.classList.toggle('fut',i>cur);s.g.querySelectorAll('line').forEach(e=>e.setAttribute('stroke-width',i===cur?2.6:1.5));});
+ const s=steps[cur],hook=$('hook');hook.setAttribute('transform',`translate(${s.P.x} ${s.P.y})`);hook.style.display=s.type==='end'?'none':'';
+ $('stage').innerHTML=`<span class="swatch" style="background:${COLN(s.c)}"></span>`+s.stage;
+ $('seg').textContent=s.seg||'';$('act').textContent=s.act;$('where').textContent=s.where;$('how').textContent=HOW[s.type]||'Закрепите нить.';$('tip').textContent=s.tip||'';
+ $('count').textContent=s.cnt||'';$('scrub').value=cur;let act=0;J.forEach(([,i],k)=>{if(cur>=i)act=k;});jb.forEach((b,k)=>b.classList.toggle('main',k===act));
+ $('play').textContent=timer?'❚❚ Пауза':(cur>=steps.length-1?'↺ Сначала':'▶ Вязать');}
+function go(i){cur=Math.max(0,Math.min(steps.length-1,i));if(cur>=steps.length-1)stop();render();}
+function tick(){if(cur>=steps.length-1){stop();render();return;}cur++;timer=setTimeout(tick,+$('speed').value);render();}
+function stop(){clearTimeout(timer);timer=null;}
+function toggle(){if(timer){stop();render();}else{if(cur>=steps.length-1)cur=0;timer=setTimeout(tick,+$('speed').value);render();}}
+$('play').onclick=toggle;$('next').onclick=()=>{stop();go(cur+1);};$('prev').onclick=()=>{stop();go(cur-1);};
+$('scrub').oninput=()=>{stop();go(+$('scrub').value);};$('speed').onchange=()=>{if(timer){stop();toggle();}};
+
+let syncing=false;
+$('euSize').oninput=()=>{if(syncing)return;const e=+$('euSize').value;if(e>=20&&e<=50){syncing=true;$('footLen').value=(Math.round((e/1.5-1.5)*2)/2);syncing=false;}regen();};
+$('footLen').oninput=()=>{if(syncing)return;const f=+$('footLen').value;if(f>0){syncing=true;$('euSize').value=Math.round((f+1.5)*1.5);syncing=false;}regen();};
+['allow','gSt','gRow','holeStep','holeInset','cordW'].forEach(id=>$(id).oninput=regen);
+
+/* ---------- counter ---------- */
+let projects=store.get('petelka.projects',[]),curProj=store.get('petelka.cur',0);
+if(!projects.length)projects=[{name:'Подошва 42 (пример)',rows:[],row:0,stitch:0,labels:[],targets:[]}];
+function save(){store.set('petelka.projects',projects);store.set('petelka.cur',curProj);}
+function pj(){if(curProj>=projects.length)curProj=0;return projects[curProj];}
+function renderCnt(){const p=pj();
+ $('projSel').innerHTML=projects.map((x,i)=>`<option value="${i}"${i===curProj?' selected':''}>${x.name.replace(/</g,'&lt;')}</option>`).join('');
+ const lab=p.labels[p.row]||('Ряд '+(p.row+1)),tg=p.targets[p.row];
+ $('cRowLabel').textContent=lab;$('cTarget').textContent=tg?('цель: '+tg+' п.'):'';
+ $('cStitch').textContent=p.stitch;$('cSub').textContent=tg?(p.stitch>=tg?'ряд набран, нажмите «Ряд готов»':'осталось '+(tg-p.stitch)+' п.'):'петель в этом ряду';
+ $('cBar').style.width=tg?Math.min(100,p.stitch/tg*100)+'%':'0';
+ $('cProjTitle').textContent=p.name;$('cRowNum').textContent=(p.row+1)+(p.targets.length?' из '+p.targets.length:'');
+ $('cTotal').textContent=p.rows.reduce((s,x)=>s+x,0)+p.stitch;$('cDelConfirm').hidden=true;$('cDelete').hidden=false;save();}
+$('cPlus').onclick=()=>{pj().stitch++;renderCnt();};
+$('cMinus').onclick=()=>{const p=pj();if(p.stitch>0)p.stitch--;renderCnt();};
+$('cRowDone').onclick=()=>{const p=pj();p.rows[p.row]=p.stitch;p.row++;p.stitch=0;renderCnt();};
+$('cRowBack').onclick=()=>{const p=pj();if(p.row>0){p.row--;p.stitch=p.rows[p.row]||0;p.rows.length=p.row;}renderCnt();};
+$('cResetRow').onclick=()=>{pj().stitch=0;renderCnt();};
+$('projSel').onchange=()=>{curProj=+$('projSel').value;renderCnt();};
+$('projNewBtn').onclick=()=>{$('projNewRow').hidden=!$('projNewRow').hidden;if(!$('projNewRow').hidden)$('projName').focus();};
+$('projCreate').onclick=()=>{const n=$('projName').value.trim()||('Проект '+(projects.length+1));projects.push({name:n,rows:[],row:0,stitch:0,labels:[],targets:[]});curProj=projects.length-1;$('projName').value='';$('projNewRow').hidden=true;renderCnt();};
+$('cDelete').onclick=()=>{$('cDelConfirm').hidden=false;$('cDelete').hidden=true;};
+$('cDelNo').onclick=()=>{$('cDelConfirm').hidden=true;$('cDelete').hidden=false;};
+$('cDelYes').onclick=()=>{projects.splice(curProj,1);if(!projects.length)projects.push({name:'Проект 1',rows:[],row:0,stitch:0,labels:[],targets:[]});curProj=0;renderCnt();};
+$('toCounter').onclick=()=>{if(!GEN)return;const m=METHODS.find(x=>x[0]===method)[1].replace(/^\d+\.\s*/,'');
+ projects.push({name:`${m}, р. ${$('euSize').value}`,rows:[],row:0,stitch:0,labels:GEN.counter.labels,targets:GEN.counter.targets});curProj=projects.length-1;renderCnt();showTab('cnt');};
+
+/* ---------- gauge ---------- */
+const fmt=(x,d)=>(Math.round(x*Math.pow(10,d||1))/Math.pow(10,d||1)).toString().replace('.',',');
+function gauge(){const w=+$('sW').value,st=+$('sSt').value,hh=+$('sH').value,rr=+$('sR').value,g=+$('sG').value;
+ if(!(w>0&&st>0&&hh>0&&rr>0)){$('gOut').innerHTML='<span class="err">Заполните размеры и число петель образца.</span>';return null;}
+ const st10=st/w*10,r10=rr/hh*10,gcm=g>0?g/(w*hh):0;
+ $('gOut').innerHTML=[['Петель в 10 см',fmt(st10)],['Рядов в 10 см',fmt(r10)],['Петель в 1 см',fmt(st10/10,2)],['Вес 1 см²',gcm?fmt(gcm,3)+' г':'—']].map(([a,b])=>`<span class="chip">${a} <b>${b}</b></span>`).join('');
+ const pst=+$('pSt').value,pn=+$('pN').value;$('pOut').textContent=pst>0&&pn>0?`Вам нужно ≈ ${Math.round(pn*st10/pst)} петель`:'';
+ const ww=+$('wantW').value,wh=+$('wantH').value;$('wOut').textContent=ww>0&&wh>0?`${Math.round(ww*st10/10)} петель × ${Math.round(wh*r10/10)} рядов`:'';
+ const ar=+$('area').value,mp=+$('mPer').value,res=+$('reserve').value;
+ if(gcm&&ar>0&&mp>0){const gr=ar*gcm*(1+res/100);$('yOut').textContent=`≈ ${Math.round(gr)} г, это ≈ ${Math.round(gr*mp/100)} м`;}else $('yOut').textContent='Укажите вес образца, чтобы посчитать расход.';
+ return {st10,r10};}
+['sW','sSt','sH','sR','sG','pSt','pN','wantW','wantH','area','mPer','reserve'].forEach(id=>$(id).oninput=gauge);
+$('gToGen').onclick=()=>{const g=gauge();if(!g)return;$('gSt').value=fmt(g.st10).replace(',','.');$('gRow').value=fmt(g.r10).replace(',','.');regen();showTab('gen');};
+
+/* ---------- reference ---------- */
+const REF=[
+ ['ch','Воздушная петля','в. п.','ch','ch','Захватите нить и протяните через петлю на крючке.'],
+ ['sl','Соединительный столбик','соед. ст.','sl st','ss','Крючок в петлю, нить протянуть сразу через петлю полотна и петлю на крючке.'],
+ ['sc','Столбик без накида','сбн','sc','dc','Крючок в петлю, вытянуть петлю (2 на крючке), провязать обе вместе.'],
+ ['hdc','Полустолбик с накидом','пссн','hdc','htr','Накид, вытянуть петлю (3 на крючке), провязать все 3 вместе.'],
+ ['dc','Столбик с накидом','ссн','dc','tr','Накид, вытянуть петлю (3), провязать по 2 дважды.'],
+ ['tr','Столбик с 2 накидами','сс2н','tr','dtr','2 накида, вытянуть петлю (4), провязать по 2 трижды.'],
+ ['inc','Прибавка','приб.','inc','inc','2 столбика в одну петлю предыдущего ряда.'],
+ ['dec','Убавка','уб.','dec (sc2tog)','dec (dc2tog)','Вытянуть петли из 2 соседних петель и провязать вместе.'],
+ ['ring','Магическое (амигуруми) кольцо','КА','magic ring','magic ring','Обернуть нить петлёй вокруг пальцев, провязать столбики в кольцо, затянуть хвост.']];
+REF.forEach(r=>{const tr=document.createElement('tr');const td=document.createElement('td');td.className='sym';td.appendChild(iconSvg(r[0]));tr.appendChild(td);
+ [r[1],r[2],r[3],r[4],r[5]].forEach((v,i)=>{const c=document.createElement('td');c.textContent=v;if(i>0&&i<4)c.className='mono';tr.appendChild(c);});$('refBody').appendChild(tr);});
+[['Задняя полупетля','з. п/п','BLO','BLO','Крючок только под дальнюю нить петли, даёт рубчик.'],['Передняя полупетля','п. п/п','FLO','FLO','Крючок только под ближнюю нить.'],['Рельефный лицевой ссн','рл. ссн','FPdc','FPtr','Крючок вводится вокруг ножки столбика спереди.'],['Рельефный изнаночный ссн','ри. ссн','BPdc','BPtr','Крючок вводится вокруг ножки столбика сзади.']]
+ .forEach(r=>{const tr=document.createElement('tr');tr.innerHTML='<td class="sym"></td>';r.forEach((v,i)=>{const c=document.createElement('td');c.textContent=v;if(i>0&&i<4)c.className='mono';tr.appendChild(c);});$('refBody').appendChild(tr);});
+
+/* ---------- keys & boot ---------- */
+document.addEventListener('keydown',e=>{const t=e.target.tagName;if(t==='INPUT'||t==='SELECT'||(t==='BUTTON'&&e.code!=='ArrowRight'&&e.code!=='ArrowLeft'))return;
+ if(!$('p-gen').hidden){if(e.code==='Space'){e.preventDefault();toggle();}else if(e.key==='ArrowRight'){stop();go(cur+1);}else if(e.key==='ArrowLeft'){stop();go(cur-1);}}
+ else if(!$('p-cnt').hidden&&(e.code==='Space'||e.key==='Enter')){e.preventDefault();pj().stitch++;renderCnt();}});
+const saved=store.get('petelka.gen',null);if(saved){$('footLen').value=saved.foot;$('allow').value=saved.allow;$('gSt').value=saved.st10;$('gRow').value=saved.row10;$('euSize').value=Math.round((saved.foot+1.5)*1.5);if(saved.holeStep)$('holeStep').value=saved.holeStep;if(saved.holeInset)$('holeInset').value=saved.holeInset;if(saved.cordW)$('cordW').value=saved.cordW;}
+regen();renderCnt();gauge();
+const h=(location.hash||'').slice(1);showTab(['gen','cnt','gauge','ref'].includes(h)?h:store.get('petelka.tab','gen'));
+})();
+</script>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id),bar=$('installBar');let deferred=null;
+const hidden=()=>{try{return localStorage.getItem('petelka.installHidden')==='1';}catch(e){return false;}};
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;if(!standalone&&!hidden())bar.hidden=false;});
+$('installBtn').onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice.catch(()=>{});deferred=null;bar.hidden=true;};
+$('installClose').onclick=()=>{bar.hidden=true;try{localStorage.setItem('petelka.installHidden','1');}catch(e){}};
+window.addEventListener('appinstalled',()=>{bar.hidden=true;});
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+if(ios&&!standalone&&!hidden()){$('installText').textContent='Чтобы установить на iPhone: кнопка «Поделиться», затем «На экран «Домой»».';$('installBtn').hidden=true;bar.hidden=false;}
+const net=()=>{$('netState').textContent=navigator.onLine?'':'офлайн';};addEventListener('online',net);addEventListener('offline',net);net();
+if('serviceWorker' in navigator){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+})();
+</script>
+</body>
+</html>

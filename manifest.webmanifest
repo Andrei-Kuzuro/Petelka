@@ -1,0 +1,22 @@
+{
+  "name": "Петелька — вязание крючком",
+  "short_name": "Петелька",
+  "description": "Схемы подошвы по размеру, счётчик рядов, калькулятор плотности и шпаргалка обозначений.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#121817",
+  "theme_color": "#1C2826",
+  "categories": ["lifestyle", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Счётчик", "url": "./#cnt", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Плотность", "url": "./#gauge", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
